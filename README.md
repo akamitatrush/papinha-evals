@@ -45,6 +45,7 @@
 | [🧭 Código ou juiz?](#-código-ou-juiz) | [🗂️ Taxonomia](#-taxonomia-de-falhas) | [📐 Priorização](#-priorização) |
 | [🚀 Instalação](#-instalação) | [▶️ Uso](#-uso) | [📊 Validação](#-validação-e-métricas) |
 | [🧪 Testes](#-testes) | [🛣️ Roadmap](#-roadmap) | [📚 Referências](#-referências) |
+| [🤝 Autoria](#-autoria) | | |
 
 ---
 
@@ -842,6 +843,40 @@ critério estreito não precisa do modelo mais caro.
 > instrumento) e um exemplo novo; na re-execução, o veredito corrigiu. Uma
 > iteração de dev, do jeito que o fluxo prevê.
 
+### Anotar os traces — `anotar.html`
+
+A rotulagem humana é o gargalo de todo projeto de evals — e é onde a maioria
+desiste, porque exige abrir terminal, editar CSV na mão ou aprender ferramenta
+nova. Aqui ela é um **arquivo único que abre com duplo clique**:
+
+```bash
+# não precisa de servidor, nem de instalação — só abrir no navegador
+xdg-open anotar.html      # Linux
+open anotar.html          # macOS
+```
+
+<div align="center">
+
+| Recurso | Como funciona |
+|:---|:---|
+| 📂 **Carga** | arraste o `traces.jsonl` para a página; solte junto um `rotulos.csv` antigo para retomar |
+| 💾 **Autosave** | cada clique salva no navegador (localStorage) — fechar a aba no trace 47 de 100 não perde nada |
+| 🔦 **Destaque de risco** | termos como `mel`, `sal`, `uva`, `liquidificador` acendem na resposta do bot, com a mesma normalização dos avaliadores (*"melão" não acende*) |
+| 🗺️ **Minimapa** | um ponto clicável por trace: 🟢 completo · 🔴 completo com falha · 🟡 parcial |
+| ⌨️ **Atalhos** | `1-9` cicla cada modo (passa → falha → na) · `←` `→` navega · `espaço` pula ao próximo pendente · avanço automático ao completar |
+| ✍️ **Codificação aberta** | campo de anotação livre por trace, exportado em `codificacao_aberta.jsonl` |
+| ⬇️ **Exportação** | gera o `rotulos.csv` no formato exato do harness, com resumo de falhas por modo no cabeçalho |
+
+</div>
+
+> [!TIP]
+> **O destaque não é veredito.** Um termo aceso pode estar numa advertência
+> correta ("não use mel"). Ele existe para acelerar o olho de quem anota — a
+> decisão continua humana, e é exatamente isso que o padrão-ouro exige.
+>
+> Nada sai do navegador: sem servidor, sem telemetria, sem dependências. Dá
+> para mandar o arquivo no grupo da turma e cada pessoa rotula um lote.
+
 ### Coletar traces reais
 
 ```bash
@@ -1071,11 +1106,26 @@ Funciona no Claude Code (CLI, desktop, web, extensões de IDE) e via
 
 <div align="center">
 
+## 🤝 Autoria
+
+Feito a quatro mãos, em sessão de pareamento:
+
+| | |
+|:---:|:---|
+| 👨‍💻 | **[Sérgio Hasher](https://github.com/akamitatrush)** — direção do projeto, domínio, decisões de escopo, e a parte que nenhuma automação substitui: coletar e rotular os traces reais |
+| 🤖 | **Claude** (Opus 5, via [Claude Code](https://claude.com/claude-code)) — implementação dos avaliadores, juízes, harness de validação, interface de anotação e documentação |
+
+O processo espelhou o que o projeto prega: cada detector nasceu com testes de
+falso positivo, cada juiz foi executado de verdade antes de ser commitado, e o
+primeiro bug encontrado pela suíte estava — como sempre — na própria suíte.
+
+---
+
 <sub>Exercício da formação **Artificial Intelligence Product Leaders** · Tera · Turma 6</sub><br>
 <sub>Aula: *Guardrails, testes e evals — Parte 2* · Expert: **Lucas Rocha**</sub>
 
 <br>
 
-<sub>🍲 Construído com <a href="https://claude.com/claude-code">Claude Code</a></sub>
+<sub>🍲 Sérgio Hasher & Claude — construído junto, commit a commit</sub>
 
 </div>
