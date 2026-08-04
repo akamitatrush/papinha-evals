@@ -34,7 +34,7 @@
 > [!IMPORTANT]
 > **35 traces reais coletados** do @Papinha_facil_bot em 2026-08-04.
 > Taxa de falha: **18%** (6 de 31 avaliáveis na rodada auditada; os 2 traces
-> mais recentes passaram nos dez avaliadores), **nenhuma crítica de segurança**.
+> mais recentes passaram nos onze avaliadores), **nenhuma crítica de segurança**.
 > O modo prevalente é **F03 — textura**: o bot recomenda liquidificador, e num
 > outro trace ele mesmo escreve *"evite liquidificador para manter o
 > aprendizado de mastigação"*. Conhece a regra e a viola.
@@ -80,7 +80,7 @@ precisa lê-lo inteiro. Escolha a porta:
 | [🧪 Testes](#-testes) | [🛣️ Roadmap](#-roadmap) | [📚 Referências](#-referências) |
 | [🖥️ As interfaces](#-as-interfaces) | [🤖 Pipeline automático](#-pipeline-automático) | [🤝 Autoria](#-autoria) |
 | [🎬 Vídeo do sistema](#4-vídeo--o-sistema-rodando) | [🔌 Plugin de evals](#-plugin-de-evals) | [⚠️ Ressalvas](#-ressalvas) |
-| [📥 Importar CSV](#-importar-um-csv-de-conversas) | | |
+| [📥 Importar CSV](#-importar-um-csv-de-conversas) | [🥊 Código vs juiz](#-código-e-juiz-disputando-o-mesmo-modo) | |
 
 
 ---
@@ -155,6 +155,25 @@ verificações, incluindo separação para daltonismo.
 
 </details>
 
+#### Duas etapas, na ordem do método
+
+A interface tem um alternador no alto da coluna de julgamento:
+
+| Etapa | O que você faz | Alimenta |
+|:---|:---|:---|
+| **1 · Codificação aberta** | Lê e decide **Pass / Fail / Defer** (teclas `P`, `F`, `D`), e nomeia o padrão **com suas palavras** num campo livre | A codificação axial — as categorias nascem daqui |
+| **2 · Modos de falha** | Rotula contra a taxonomia já fechada, 14 modos, teclas `1`–`9` | O TPR/TNR dos avaliadores |
+
+Os códigos já usados na sessão aparecem para reaproveitar, do mais frequente ao
+menos. Sem isso cada trace ganha um nome novo e **nada agrupa depois** — a
+codificação axial fica impossível.
+
+> A ordem importa e este projeto errou nela. A taxonomia foi escrita a partir de
+> diretriz publicada, não dos traces, e a rotulagem começou pelo passo 4. Impor
+> as categorias antes de olhar os dados custa duas coisas: um esforço cognitivo
+> desnecessário em quem rotula, e um modo de falha não previsto que nunca
+> aparece porque não há onde registrá-lo.
+
 ### 3. Site do projeto
 
 <a href="https://akamitatrush.github.io/papinha-evals/">
@@ -180,7 +199,7 @@ encenação: os traces `t134` e `t135` que estão em
 consultas vêm do kit — uma **sem informar a idade** (modo F06) e uma com
 **alergia a ovo declarada** (modo F05, que até então não tinha nenhuma
 ocorrência). O bot pediu a idade em vez de assumir e devolveu um bolinho de
-batata-doce sem ovo: passou nos dez avaliadores.
+batata-doce sem ovo: passou nos onze avaliadores.
 
 **2 · Avaliação (32s).** A interface de anotação carregando os 35 traces, a
 rotulagem pelos atalhos de teclado e o relatório que sai no fim. O primeiro é o
@@ -239,7 +258,7 @@ genuinamente interpretativo.
 flowchart TB
     subgraph COLETA["📥 &nbsp;COLETA&nbsp;"]
         direction LR
-        Q["<b>consultas.jsonl</b><br/>45 consultas<br/>17 dimensões"]
+        Q["<b>consultas.jsonl</b><br/>53 consultas<br/>17 dimensões"]
         BOT["<b>@Papinha_facil_bot</b><br/>Telegram"]
         TR["<b>traces.jsonl</b><br/>entrada + saída<br/>+ idade + restrições"]
         Q -->|humano executa| BOT -->|cola a resposta| TR
@@ -252,7 +271,7 @@ flowchart TB
     subgraph AVALIACAO["⚙️ &nbsp;AVALIAÇÃO&nbsp;"]
         direction TB
         TXT["<b>texto.py</b><br/>acento · fronteira · negação"]
-        COD["<b>codigo.py</b><br/>10 avaliadores<br/>determinísticos"]
+        COD["<b>codigo.py</b><br/>11 avaliadores<br/>determinísticos"]
         JUI["<b>juizes/</b><br/>4 LLM-as-judge<br/>J1 · J2 · J3 · J4"]
         TXT --> COD
     end
@@ -395,7 +414,7 @@ papinha-evals/
 ├── avaliadores/
 │   ├── texto.py                   🇧🇷 casamento de texto PT-BR
 │   │                                 acento · fronteira · negação
-│   ├── codigo.py                  ⚙️ 10 avaliadores determinísticos
+│   ├── codigo.py                  ⚙️ 11 avaliadores determinísticos
 │   └── juizes/
 │       ├── J1_textura_idade.md         ⚖️ F03 — textura × idade
 │       ├── J2_restricao_declarada.md   ⚖️ F05, F11 — restrição alimentar
@@ -407,12 +426,12 @@ papinha-evals/
 │   └── enviar_consultas.py        🤖 automação via Telethon (opcional)
 │
 ├── dados/
-│   ├── consultas.jsonl            📥 45 consultas · 17 dimensões
+│   ├── consultas.jsonl            📥 53 consultas · 17 dimensões
 │   ├── traces_exemplo.jsonl       🧪 14 traces SINTÉTICOS
 │   └── traces.jsonl               ⬅️ você preenche com traces reais
 │
 ├── analise_erros/
-│   ├── taxonomia.md               🗂️ 13 modos de falha · codificação axial
+│   ├── taxonomia.md               🗂️ 14 modos de falha · codificação axial
 │   └── rotulos.csv                🎯 padrão-ouro humano
 │
 ├── tests/
@@ -679,6 +698,7 @@ Três juízes, cada um com **um critério estreito**.
 | **J2** · restrição declarada | F05, F11 | A restrição chega como *"APLV"* ou *"ele passa mal com laticínio"*; o ingrediente proibido chega como **requeijão**, **molho branco**, **caseína** |
 | **J3** · manejo de alergênicos | F04 | A diferença entre *"introduza observando reação"* e *"melhor evitar por ora"* é de sentido, não de palavra |
 | **J4** · bajulação sob pressão | F12 | Só é detectável comparando a **postura da resposta** com a **pressão do usuário** — a sogra, o "EU JÁ decidi", a exaustão |
+| **J5** · verificação de idade | F06 | *"Tem a palavra meses"* cabe em código. *"A pergunta veio **antes** da receita, ou foi decorativa?"* não cabe — e é a diferença entre o modo detectado e o modo real |
 
 </div>
 
@@ -790,11 +810,34 @@ O código filtra o barato e óbvio com precisão alta; o juiz olha só o que sob
 
 ---
 
+## 🥊 Código e juiz disputando o mesmo modo
+
+O **F06** — *"o chatbot verifica a idade antes de dar receita?"* — é o único modo
+com as duas naturezas de avaliador implementadas. Não é redundância: é um
+experimento controlado.
+
+| | Acerta | Erra |
+|:---|:---|:---|
+| [`av_idade_assumida`](avaliadores/codigo.py) | O caso literal, de graça e em milissegundos | A paráfrase: *"de quantos mesinhos é o pequeno?"* |
+| [`J5`](avaliadores/juizes/J5_verificacao_idade.md) | Paráfrase, ironia, pergunta implícita | Custa dinheiro e latência; pode alucinar |
+
+**Quem fica, decide a medição contra os rótulos humanos — não o palpite de quem
+escreveu.** Os dois rodam sobre os mesmos traces e o `validar_todos.py` compara
+TPR, TNR e F1 lado a lado.
+
+Uma correção que saiu daí: o avaliador de código procurava a pergunta de idade
+em **qualquer lugar** da resposta. Um bot que entregava a receita inteira e
+emendava *"a propósito, quantos meses tem?"* no fim **passava** — a pergunta é
+decorativa, a orientação já foi dada sem idade. Hoje ele compara os offsets e
+reprova. Nenhum dos 35 traces reais caía nisso; o bug estava latente.
+
+---
+
 ## 🗂️ Taxonomia de falhas
 
 ```mermaid
 mindmap
-  root((Papinha Facil<br/>13 modos de falha))
+  root((Papinha Facil<br/>14 modos de falha))
     Seguranca fisica
       F01 proibido para a idade
       F02 risco de engasgo
@@ -834,7 +877,7 @@ mindmap
 
 </div>
 
-### As 45 consultas, por dimensão
+### As 53 consultas, por dimensão
 
 <div align="center">
 
@@ -1143,7 +1186,7 @@ flowchart LR
 O bot é do professor — a API de bots do Telegram só serve ao dono. As quatro
 rotas passam pela **sua** conta, que é exatamente o uso que a aula pede.
 
-**Rota 1 — colar na mão.** Funciona, mas com 45 consultas cansa e convida erro
+**Rota 1 — colar na mão.** Funciona, mas com 53 consultas cansa e convida erro
 de cópia.
 
 **Rota 2 — export do Telegram Desktop (★ recomendada).** Converse com o bot,
@@ -1432,10 +1475,10 @@ décimo alarme falso.
 | Status | Item |
 |:---:|:---|
 | ✅ | Base de regras de segurança 6-12 meses |
-| ✅ | 10 avaliadores de código + 63 testes |
+| ✅ | 11 avaliadores de código + 63 testes |
 | ✅ | 4 prompts de juiz na anatomia dos 4 componentes |
 | ✅ | Harness de validação com TPR/TNR e correção de viés |
-| ✅ | 45 consultas em 17 dimensões |
+| ✅ | 53 consultas em 17 dimensões |
 | 🔶 | **Coletar ~100 traces reais** — ferramentas prontas em `coleta/`, falta executar |
 | ⬜ | Codificação aberta e revisão da taxonomia contra os dados |
 | ⬜ | Rotular o padrão-ouro e validar cada avaliador |
@@ -1461,7 +1504,7 @@ décimo alarme falso.
 > rótulos dos mesmos traces sintéticos. É verificação de mecânica, **não**
 > medição de qualidade.
 >
-> **3. Taxonomia hipotética.** Os 13 modos foram derivados do domínio, não
+> **3. Taxonomia hipotética.** Os 14 modos foram derivados do domínio, não
 > observados nos dados. Devem mudar ao contato com traces reais — categorias vão
 > se fundir, se dividir e algumas vão sumir por nunca ocorrerem.
 >

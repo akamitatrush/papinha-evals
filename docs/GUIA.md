@@ -91,13 +91,13 @@ Quatro caminhos, todos pela conta do próprio usuário (a API de bots do Telegra
 só serve ao dono do bot). O recomendado é exportar a conversa do Telegram
 Desktop e rodar `coleta/importar_telegram.py` — zero credenciais.
 
-### Detectores determinísticos (10)
+### Detectores determinísticos (11)
 Leem `dominio/regras_seguranca.yaml` e nada mais. **Nenhuma regra vive no
 Python** — um nutricionista calibra o sistema editando uma lista em YAML, sem
 abrir código. Cobrem alimento proibido, engasgo, textura, alergênico, idade,
-escopo médico, ferro, completude, idioma e domínio.
+escopo médico, ferro, completude, idioma, domínio e condições metabólicas raras.
 
-### Juízes LLM (4)
+### Juízes LLM (5)
 Para o que exige interpretação genuína. Cada um tem **um critério estreito**:
 J1 não olha segurança, J2 não olha textura, J3 não olha engasgo. Juiz que
 avalia "qualidade geral" não é avaliador, é resenha.
@@ -129,7 +129,7 @@ git clone https://github.com/akamitatrush/papinha-evals.git
 cd papinha-evals
 python -m venv --system-site-packages .venv
 ./.venv/bin/pip install pytest pyyaml
-./.venv/bin/python -m pytest tests/ -q          # 71 testes
+./.venv/bin/python -m pytest tests/ -q          # 82 testes
 ./.venv/bin/python auto.py --so-codigo          # custo zero, sem API
 ```
 
