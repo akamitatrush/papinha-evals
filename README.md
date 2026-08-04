@@ -56,7 +56,7 @@
 | [🧭 Código ou juiz?](#-código-ou-juiz) | [🗂️ Taxonomia](#-taxonomia-de-falhas) | [📐 Priorização](#-priorização) |
 | [🚀 Instalação](#-instalação) | [▶️ Uso](#-uso) | [📊 Validação](#-validação-e-métricas) |
 | [🧪 Testes](#-testes) | [🛣️ Roadmap](#-roadmap) | [📚 Referências](#-referências) |
-| [🖥️ As interfaces](#️-as-interfaces) | [🤖 Pipeline automático](#-pipeline-automático) | [🤝 Autoria](#-autoria) |
+| [🖥️ As interfaces](#-as-interfaces) | [🤖 Pipeline automático](#-pipeline-automático) | [🤝 Autoria](#-autoria) |
 
 
 ---
