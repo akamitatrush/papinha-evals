@@ -35,6 +35,10 @@
 > **35 traces reais coletados** do @Papinha_facil_bot em 2026-08-04.
 > Taxa de falha: **18%** (6 de 31 avaliáveis na rodada auditada; os 2 traces
 > mais recentes passaram nos onze avaliadores), **nenhuma crítica de segurança**.
+> **O avaliador de idade (F06) foi medido** contra 195 rótulos humanos do
+> dataset da turma: **TPR 76% · TNR 79% · F1 62%** — abaixo da meta de 90%,
+> e o relatório diz isso. Os outros treze modos seguem sem padrão-ouro.
+>
 > O modo prevalente é **F03 — textura**: o bot recomenda liquidificador, e num
 > outro trace ele mesmo escreve *"evite liquidificador para manter o
 > aprendizado de mastigação"*. Conhece a regra e a viola.
@@ -80,7 +84,7 @@ precisa lê-lo inteiro. Escolha a porta:
 | [🧪 Testes](#-testes) | [🛣️ Roadmap](#-roadmap) | [📚 Referências](#-referências) |
 | [🖥️ As interfaces](#-as-interfaces) | [🤖 Pipeline automático](#-pipeline-automático) | [🤝 Autoria](#-autoria) |
 | [🎬 Vídeo do sistema](#4-vídeo--o-sistema-rodando) | [🔌 Plugin de evals](#-plugin-de-evals) | [⚠️ Ressalvas](#-ressalvas) |
-| [📥 Importar CSV](#-importar-um-csv-de-conversas) | [🥊 Código vs juiz](#-código-e-juiz-disputando-o-mesmo-modo) | |
+| [📥 Importar CSV](#-importar-um-csv-de-conversas) | [🥊 Código vs juiz](#-código-e-juiz-disputando-o-mesmo-modo) | [🎯 A medição](#-a-medição-que-fechou-o-loop) |
 
 
 ---
@@ -1325,6 +1329,71 @@ comportamento certo. Preencher com chute contaminaria a avaliação.
 > Não solte um CSV de conversas no `anotar.html`: lá o `.csv` é lido como
 > arquivo de **rótulos**. Ele agora avisa em vez de falhar em silêncio, mas o
 > caminho é este script.
+
+---
+
+## 🎯 A medição que fechou o loop
+
+O dataset da turma trouxe **195 conversas com rótulo humano** e o critério
+oficial por escrito. Foi a primeira vez que um avaliador deste projeto foi
+medido contra julgamento que não é nosso.
+
+```bash
+./.venv/bin/python coleta/importar_csv.py traces_papinha_facil_rotulado.csv \
+    --saida dados/traces_turma.jsonl --prefixo c
+./.venv/bin/python rodar_evals.py dados/traces_turma.jsonl \
+    --saida analise_erros/predicoes_turma.jsonl
+./.venv/bin/python validar_todos.py \
+    --rotulos analise_erros/rotulos_turma.csv \
+    --predicoes analise_erros/predicoes_turma.jsonl
+```
+
+| Iteração | TPR | TNR | O que mudou |
+|:---|---:|---:|:---|
+| 1ª medição | 76% | **49%** | 76 das 149 respostas corretas acusadas |
+| Idade lida do texto | 76% | 76% | Em 46 conversas a idade estava na pergunta, e o avaliador só lia `idade_meses` |
+| Receita estrita | **61%** | 83% | Exigir "modo de preparo" literal derrubou o TPR |
+| Passos numerados | **76%** | **79%** | Nem toda receita escreve "modo de preparo" |
+
+**F1 final: 62%.** Abaixo da meta de 90%, e é isso que o relatório mostra.
+
+### O que a medição ensinou
+
+**O avaliador lia a idade de um campo que trace de produção não tem.** Ele foi
+escrito assumindo que o coletor preenche `idade_meses`. Contra CSV cru, concluía
+"idade não informada" em 46 conversas onde ela estava escrita na pergunta. Hoje
+existe `extrair_idade()`, que lê do **input** — nunca do output, porque o bot
+dizendo *"para bebês de 6 meses"* não é o usuário informando.
+
+**O trade-off apareceu na cara.** Apertar a definição de receita subiu o TNR e
+derrubou o TPR quinze pontos. Neste domínio o falso negativo é o erro que dói —
+deixar passar mel para um bebê de 8 meses — então a versão estrita foi
+descartada mesmo tendo o TNR mais alto.
+
+### Uma ambiguidade que ficou registrada, não contornada
+
+No trace `c139` o bot pede os ingredientes, **nunca pergunta a idade** e não
+entrega receita. Pelas regras de FALHA escritas no critério oficial, isso não é
+falha. O humano marcou falha, aplicando leitura mais rígida.
+
+Não ajustei o avaliador para casar com esse caso: seria **overfitting no rótulo**
+em vez de correção de critério. Onde o humano e o critério escrito divergem, o
+achado é do critério.
+
+### Ferramenta de calibração
+
+[`discordancias.py`](discordancias.py) gera um HTML com **só onde avaliador e
+humano discordaram**, lado a lado com a justificativa do avaliador:
+
+```bash
+./.venv/bin/python discordancias.py --modo F06 --split dev \
+    --rotulos analise_erros/rotulos_turma.csv \
+    --predicoes analise_erros/predicoes_turma.jsonl \
+    --traces dados/traces_turma.jsonl
+```
+
+Falso negativo primeiro — neste domínio é o que dói. E o script avisa se você
+pedir o split de **teste**: iterar contra ele transforma o teste num segundo dev.
 
 ---
 

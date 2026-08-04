@@ -277,7 +277,7 @@ footer a:hover{color:var(--sinal);border-bottom-color:var(--sinal)}
     <a class="marca" href="#topo"><span class="selo">P</span><b>Papinha&nbsp;Evals</b></a>
     <div class="nav-links">
       <a href="#tese">Tese</a><a href="#metodo">Método</a>
-      <a href="#video">Vídeo</a><a href="#ferramentas">Ferramentas</a>
+      <a href="#medicao">Medição</a><a href="#video">Vídeo</a><a href="#ferramentas">Ferramentas</a>
       <a href="#ressalvas">Ressalvas</a>
     </div>
     <a class="btn" href="https://github.com/akamitatrush/papinha-evals">GitHub</a>
@@ -450,6 +450,37 @@ footer a:hover{color:var(--sinal);border-bottom-color:var(--sinal)}
   </div>
 </section>
 
+<!-- ═══ MEDIÇÃO ════════════════════════════════════════════════════════════ -->
+<section id="medicao" class="regua">
+  <div class="env revela">
+    <span class="rot">195 rótulos humanos · dataset da turma</span>
+    <h2>O avaliador, finalmente medido</h2>
+    <p>Até aqui o projeto media o bot. Esta seção mede <strong>o avaliador</strong> —
+       contra 195 conversas julgadas por uma pessoa, com o critério escrito por
+       terceiro. A primeira leitura foi humilhante e é por isso que está aqui.</p>
+
+    <div class="legenda-rodadas" style="margin-top:2rem">
+      <div><div class="q" style="color:var(--critico)">1ª medição</div>
+        <p class="d"><b style="color:var(--critico)">TNR 49%</b><br>76 das 149 respostas
+          corretas acusadas como falha.</p></div>
+      <div><div class="q" style="color:var(--alerta)">Idade no texto</div>
+        <p class="d"><b style="color:var(--alerta)">TNR 76%</b><br>Em 46 conversas a idade
+          estava na pergunta e o avaliador só lia o campo estruturado.</p></div>
+      <div><div class="q" style="color:var(--alerta)">Receita estrita</div>
+        <p class="d"><b style="color:var(--alerta)">TNR 83% · TPR 61%</b><br>Exigir “modo de
+          preparo” literal derrubou o TPR. O trade-off na cara.</p></div>
+      <div><div class="q">Final</div>
+        <p class="d"><b style="color:var(--sinal)">TPR 76% · TNR 79% · F1 62%</b><br>Passos
+          numerados também são preparo.</p></div>
+    </div>
+
+    <p class="veredito">Abaixo da meta de 90% — <b>e isso está no relatório</b>.</p>
+    <p style="margin-top:1.5rem">Um número ruim medido vale mais que um número bom
+       estimado. O que mudou não foi o bot: foi descobrir que o avaliador lia a idade
+       de um campo que trace nenhum de produção tem.</p>
+  </div>
+</section>
+
 <!-- ═══ VÍDEO ══════════════════════════════════════════════════════════════ -->
 <section id="video" class="regua">
   <div class="env revela">
@@ -544,11 +575,14 @@ footer a:hover{color:var(--sinal);border-bottom-color:var(--sinal)}
     <p>A credibilidade aqui vem da honestidade dos números. Esconder o que falta
        faria os 18% parecerem mais firmes do que são.</p>
     <div class="ressalvas">
+      <div class="ress"><h4>Um modo medido, treze não</h4>
+        <p>O <b>F06</b> foi validado contra 195 rótulos humanos: <b>TPR 76%</b>,
+           <b>TNR 79%</b>, <b>F1 62%</b> — abaixo da meta de 90%, e o relatório diz
+           isso. Os outros treze modos continuam sem padrão-ouro.</p></div>
       <div class="ress"><h4>O auditor não está validado</h4>
         <p>O pipeline usa um LLM para decidir se cada achado procede — ele próprio um
            juiz não medido, que deu respostas diferentes para o mesmo caso em execuções
-           distintas. O caminho para medir está pronto (<code>validar_todos.py</code>);
-           falta rotular a amostra à mão.</p></div>
+           distintas.</p></div>
       <div class="ress"><h4>35 traces não são 100</h4>
         <p>A coleta gravada acima cobriu dois modos que estavam sem nenhuma ocorrência
            — e o bot passou nos dois. Um trace por modo não valida avaliador nenhum.</p></div>

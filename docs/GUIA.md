@@ -154,12 +154,18 @@ domínio.
 
 Isto não é modéstia — é parte do resultado.
 
+**Um modo está medido; treze não.** O F06 foi validado contra 195 rótulos
+humanos do dataset da turma — **TPR 76%, TNR 79%, F1 62%**, abaixo da meta de
+90%. É pouco, mas é medido: a primeira leitura dava TNR de 49%, e as duas
+correções que subiram esse número vieram de ler as discordâncias, não de
+palpite. Os outros treze modos seguem sem padrão-ouro.
+
 **O auditor automático não está validado.** Ele é um juiz não medido, e nos
 testes classificou o mesmo achado de formas diferentes em execuções distintas.
 Automatizar o julgamento não elimina a validação humana: move ela de *toda
 rodada* para *uma vez*.
 
-O caminho para fechar isso está pronto e é de quatro comandos:
+Para os modos ainda não medidos, o caminho é de quatro comandos:
 
 ```bash
 ./.venv/bin/python analise_erros/preparar_rotulagem.py     # 1. prepara o CSV
