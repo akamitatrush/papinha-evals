@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Papinha Evals — o eval errou antes do bot</title>
-<meta name="description" content="Avaliadores automatizados para um chatbot de introdução alimentar infantil. Quatro medições: 100%, 64%, 48%, 18%. As três primeiras estavam erradas.">
+<meta name="description" content="Avaliadores automatizados para um chatbot de introdução alimentar infantil, medidos contra 195 rótulos humanos. Quatro medições do bot — 100%, 64%, 48%, 18% — e as três primeiras estavam erradas.">
 <meta name="theme-color" content="#07080A">
 <link rel="icon" href="icone.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="og.jpg">
@@ -12,7 +12,7 @@
      branco. og:image precisa de URL absoluta — caminho relativo não resolve
      do lado de quem recebe. -->
 <meta property="og:title" content="Papinha Evals — o eval errou antes do bot">
-<meta property="og:description" content="Quatro medições do mesmo bot: 100%, 64%, 48%, 18%. As três primeiras estavam erradas, e toda correção foi no avaliador.">
+<meta property="og:description" content="Quatro medições do mesmo bot — 100%, 64%, 48%, 18% — e as três primeiras estavam erradas. O avaliador agora é medido contra 195 rótulos humanos: TPR 87%, ainda abaixo da meta.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://akamitatrush.github.io/papinha-evals/">
 <meta property="og:image" content="https://akamitatrush.github.io/papinha-evals/og.jpg">
@@ -484,7 +484,7 @@ footer a:hover{color:var(--sinal);border-bottom-color:var(--sinal)}
         <p class="d">TPR 76% · TNR 79% · F1 62%<br>
           <b style="color:var(--critico)">11 falhas reais passaram</b></p></div>
       <div><div class="q">Juiz · US$ 0,91</div>
-        <p class="d">TPR 87% · TNR 73% · F1 64%<br>
+        <p class="d">TPR 87% · TNR 73% · F1 63%<br>
           <b style="color:var(--sinal)">6 falhas reais passaram</b></p></div>
       <div><div class="q" style="color:var(--ink-3)">F1</div>
         <p class="d">Empate técnico: 62,5% contra 63,5%. Se fosse o único critério,
@@ -595,9 +595,10 @@ footer a:hover{color:var(--sinal);border-bottom-color:var(--sinal)}
        faria os 18% parecerem mais firmes do que são.</p>
     <div class="ressalvas">
       <div class="ress"><h4>Um modo medido, treze não</h4>
-        <p>O <b>F06</b> foi validado contra 195 rótulos humanos: <b>TPR 76%</b>,
-           <b>TNR 79%</b>, <b>F1 62%</b> — abaixo da meta de 90%, e o relatório diz
-           isso. Os outros treze modos continuam sem padrão-ouro.</p></div>
+        <p>O <b>F06</b> teve os dois avaliadores validados contra 195 rótulos
+           humanos. <b>Nenhum dos dois bate a meta de 90%</b> — o melhor TPR é 87%,
+           o melhor TNR é 79%, e não são o mesmo avaliador. Os outros treze modos
+           continuam sem padrão-ouro.</p></div>
       <div class="ress"><h4>O auditor não está validado</h4>
         <p>O pipeline usa um LLM para decidir se cada achado procede — ele próprio um
            juiz não medido, que deu respostas diferentes para o mesmo caso em execuções
