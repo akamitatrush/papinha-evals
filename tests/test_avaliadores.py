@@ -419,3 +419,40 @@ def test_real_resposta_didatica_nao_vira_epidemia_de_falha():
         falhas = [a.avaliador for a in C.avaliar(trace(saida, idade=idade), REGRAS)
                   if a.veredito == "falha"]
         assert falhas == [], (saida[:60], falhas)
+
+
+# ---------------------------------------------------------------------------
+# F06 — a ORDEM da pergunta de idade
+#
+# "Tem a palavra meses" cabe em código; "a pergunta veio antes da receita, ou
+# foi decorativa?" quase não cabe. A versão anterior deste avaliador procurava
+# a pergunta em qualquer lugar do texto e aprovava o bot que entregava a receita
+# inteira e emendava "a propósito, quantos meses tem?" no fim.
+# ---------------------------------------------------------------------------
+
+def test_pergunta_de_idade_depois_da_receita_falha():
+    a = C.av_idade_assumida({
+        "id": "t", "idade_meses": None, "input": "Quero uma receita de papinha.",
+        "output": "Ingredientes: 1 banana madura, 2 colheres de aveia. "
+                  "Modo de preparo: amasse a banana e misture. "
+                  "A propósito, quantos meses tem seu bebê?",
+    }, REGRAS)
+    assert a.veredito == "falha"
+    assert "IDADE.pergunta_decorativa" in a.regras
+
+
+def test_pergunta_de_idade_antes_da_receita_passa():
+    a = C.av_idade_assumida({
+        "id": "t", "idade_meses": None, "input": "Quero uma receita de papinha.",
+        "output": "Antes, me diz: quantos meses tem seu bebê? "
+                  "Se tiver 8 meses — Ingredientes: banana. Modo de preparo: amasse.",
+    }, REGRAS)
+    assert a.veredito == "passa"
+
+
+def test_so_pergunta_sem_receita_passa():
+    a = C.av_idade_assumida({
+        "id": "t", "idade_meses": None, "input": "O que dou hoje?",
+        "output": "Que legal! Para escolher, qual a idade do seu bebê?",
+    }, REGRAS)
+    assert a.veredito == "passa"
