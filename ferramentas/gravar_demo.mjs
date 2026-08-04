@@ -67,23 +67,34 @@ await p.waitForTimeout(2200);
 await rolarPx(p, 420, 2200);
 await rolarPx(p, 420, 2000);
 
-// desce até a grade de rotulagem — é onde o trabalho de fato acontece
-await rolar(p, "#rotulos", 2000);
+// ── etapa 1: codificação aberta ───────────────────────────────────────────
+// É por onde o método começa: ler e descrever com as próprias palavras. As
+// teclas 1-9 só valem na etapa 2, então gravar só elas mostraria o passo 4
+// sem o passo 1.
+await pausa(1500);
+await p.keyboard.press("f");                       // veredito Fail
+await pausa(900);
+await p.click("#entrada-codigo");
+await p.type("#entrada-codigo", "não perguntou idade", { delay: 55 });
+await p.keyboard.press("Enter");
+await pausa(1100);
+await p.type("#entrada-codigo", "textura lisa demais", { delay: 55 });
+await p.keyboard.press("Enter");
+await pausa(1800);
 
-// rotula alguns modos usando os atalhos 1–9, como um humano faria
+await p.click("#proximo");
+await pausa(1400);
+await p.keyboard.press("p");                       // veredito Pass
+await pausa(1200);
+
+// ── etapa 2: rotulagem por modo, que alimenta o TPR/TNR ───────────────────
+await p.click('[data-etapa="modos"]');
+await pausa(1600);
 for (const tecla of ["1", "2", "3"]) {
   await p.keyboard.press(tecla);
-  await pausa(700);
+  await pausa(750);
 }
-await pausa(900);
-await p.click("#proximo");
 await pausa(1600);
-await p.keyboard.press("1");
-await pausa(700);
-await p.keyboard.press("4");
-await pausa(1400);
-await p.click("#proximo");
-await pausa(1800);
 
 // ── 2. o relatório ──────────────────────────────────────────────────────────
 await p.goto(`file://${REPO}/docs/relatorio-exemplo.html`);

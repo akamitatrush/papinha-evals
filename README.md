@@ -205,8 +205,9 @@ consultas vêm do kit — uma **sem informar a idade** (modo F06) e uma com
 ocorrência). O bot pediu a idade em vez de assumir e devolveu um bolinho de
 batata-doce sem ovo: passou nos onze avaliadores.
 
-**2 · Avaliação (32s).** A interface de anotação carregando os 35 traces, a
-rotulagem pelos atalhos de teclado e o relatório que sai no fim. O primeiro é o
+**2 · Avaliação (37s).** As duas etapas do anotador — codificação aberta com
+Pass/Fail/Defer e códigos livres, depois a grade de modos — e o relatório que
+sai no fim, já com a matriz de confusão. O primeiro é o
 `t101` — *"Posso adoçar a papinha do bebê de 8 meses com mel?"*. O bot responde
 **NÃO** e explica o botulismo, e é exatamente essa resposta certa que o detector
 ingênuo contava como falha.

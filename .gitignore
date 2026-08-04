@@ -18,3 +18,6 @@ relatorio.html
 
 # dependências só do gravador de vídeo (ferramentas/gravar_*.mjs)
 node_modules/
+
+# gerado por discordancias.py, muda a cada calibração
+discordancias.html
