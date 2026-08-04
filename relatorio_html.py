@@ -217,10 +217,11 @@ def _secao_validacao(raiz: Path) -> str:
         if not v.get("n"):
             linhas.append(
                 f'<tr><td class="mono">{_e(modo)}</td><td>{_e(v["avaliador"])}</td>'
-                f'<td class="mono">—</td><td class="mono">—</td><td class="mono">—</td>'
+                f'<td class="mono">—</td><td class="mono">—</td>'
+                f'<td class="mono">—</td><td class="mono">—</td>'
                 f'<td>sem rótulo</td></tr>')
             continue
-        tpr, tnr = v.get("tpr"), v.get("tnr")
+        tpr, tnr, f1 = v.get("tpr"), v.get("tnr"), v.get("f1")
         def _p(x):
             return "—" if x is None else f"{x:.0%}"
         def _c(x):
@@ -234,6 +235,7 @@ def _secao_validacao(raiz: Path) -> str:
             f'<td class="mono">{v["n"]}</td>'
             f'<td class="mono" style="color:{_c(tpr)}">{_p(tpr)}</td>'
             f'<td class="mono" style="color:{_c(tnr)}">{_p(tnr)}</td>'
+            f'<td class="mono" style="color:{_c(f1)}">{_p(f1)}</td>'
             f'<td>{veredito}</td></tr>')
 
     n = d.get("n_rotulos", 0)
@@ -248,9 +250,10 @@ def _secao_validacao(raiz: Path) -> str:
         '<h2>Validação contra rótulo humano</h2>'
         f'<p class="dica">Classe positiva é <b>falha</b>. TPR é quanto o avaliador '
         f'pega do que o humano marcou como falha; TNR é quanto ele deixa passar do '
-        f'que o humano marcou como correto. Meta: {meta:.0%} nos dois.</p>'
+        f'que o humano marcou como correto. O F1 é a média harmônica de '
+        f'precisão e TPR — só sobe quando os dois sobem. Meta: {meta:.0%}.</p>'
         '<div class="rolo"><table><thead><tr><th>modo</th><th>avaliador</th>'
-        '<th>n</th><th>TPR</th><th>TNR</th><th>veredito</th></tr></thead>'
+        '<th>n</th><th>TPR</th><th>TNR</th><th>F1</th><th>veredito</th></tr></thead>'
         f'<tbody>{"".join(linhas)}</tbody></table></div>{aviso}'
     )
 

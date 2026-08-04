@@ -1300,6 +1300,8 @@ Convenção: a classe **positiva** é `FALHA` — é ela que estamos tentando de
 
 ```
 TPR (sensibilidade)  = VP / (VP + FN)   →  pega as falhas que existem
+Precisão             = VP / (VP + FP)   →  quando acusa, está certo
+F1                   = média harmônica de precisão e TPR
 TNR (especificidade) = VN / (VN + FP)   →  não inventa falhas que não existem
 ```
 

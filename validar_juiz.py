@@ -127,10 +127,17 @@ def metricas(rotulos: dict[str, str], predicoes: dict[str, str], ids: list[str])
         else:
             fn += 1
             erros["fn"].append(tid)
+    # Precisão e F1 completam o quadro. TPR sozinho premia o avaliador que
+    # acusa tudo; precisão sozinha premia o que quase nunca acusa. O F1 é a
+    # média harmônica dos dois — só sobe quando os dois sobem.
+    tpr = vp / (vp + fn) if (vp + fn) else None
+    prec = vp / (vp + fp) if (vp + fp) else None
+    f1 = (2 * prec * tpr / (prec + tpr)) if (prec and tpr) else None
     return {
         "vp": vp, "fp": fp, "vn": vn, "fn": fn,
-        "tpr": vp / (vp + fn) if (vp + fn) else None,
+        "tpr": tpr,
         "tnr": vn / (vn + fp) if (vn + fp) else None,
+        "precisao": prec, "f1": f1,
         "n": vp + fp + vn + fn,
         "erros": erros,
         "ausentes": ausentes,

@@ -65,7 +65,7 @@ def main() -> int:
     resultado = {"meta": META, "modos": {}}
     print(f"\n{NEGRITO}Validação contra rótulo humano{FIM}")
     print(f"{CINZA}{'modo':<6} {'avaliador':<20} {'n':>4} {'VP':>4} {'FP':>4} "
-          f"{'VN':>4} {'FN':>4} {'TPR':>7} {'TNR':>7}{FIM}")
+          f"{'VN':>4} {'FN':>4} {'TPR':>7} {'TNR':>7} {'F1':>7}{FIM}")
 
     for modo, avaliador in sorted(AVALIADOR_DO_MODO.items()):
         try:
@@ -75,7 +75,7 @@ def main() -> int:
         if not rotulos:
             print(f"{CINZA}{modo:<6} {avaliador:<20} sem rótulo — não validado{FIM}")
             resultado["modos"][modo] = {"avaliador": avaliador, "n": 0,
-                                        "tpr": None, "tnr": None}
+                                        "tpr": None, "tnr": None, "f1": None}
             continue
 
         predicoes = ler_predicoes(args.predicoes, modo)
@@ -87,12 +87,14 @@ def main() -> int:
             "avaliador": avaliador, "n": m["n"],
             "vp": m["vp"], "fp": m["fp"], "vn": m["vn"], "fn": m["fn"],
             "tpr": m["tpr"], "tnr": m["tnr"],
+            "precisao": m["precisao"], "f1": m["f1"],
             "falsos_negativos": m["erros"]["fn"], "falsos_positivos": m["erros"]["fp"],
         }
         print(f"{modo:<6} {avaliador:<20} {m['n']:>4} {m['vp']:>4} {m['fp']:>4} "
               f"{m['vn']:>4} {m['fn']:>4} "
               f"{cor(m['tpr'])}{pct(m['tpr']):>7}{FIM} "
-              f"{cor(m['tnr'])}{pct(m['tnr']):>7}{FIM}")
+              f"{cor(m['tnr'])}{pct(m['tnr']):>7}{FIM} "
+              f"{cor(m['f1'])}{pct(m['f1']):>7}{FIM}")
 
     validados = [v for v in resultado["modos"].values() if v.get("n")]
     resultado["n_modos_validados"] = len(validados)
