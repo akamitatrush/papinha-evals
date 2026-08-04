@@ -260,6 +260,7 @@ papinha-evals/
 │   └── test_avaliadores.py        🧪 51 testes
 │
 ├── rodar_evals.py                 ▶️ executa e reporta taxa de falha
+├── julgar.py                      ⚖️ executa os juízes via `claude` CLI
 └── validar_juiz.py                📊 splits · TPR/TNR · correção de viés
 ```
 
@@ -811,6 +812,31 @@ sem procedência é métrica que engana quem lê o slide três semanas depois.
 
 </div>
 
+### Rodar os juízes LLM
+
+```bash
+# ver o prompt montado, sem gastar token
+./.venv/bin/python julgar.py avaliadores/juizes/J1_textura_idade.md dados/traces.jsonl --dry-run
+
+# julgar de verdade (usa o `claude` CLI — os tokens saem da sua assinatura,
+# sem chave de API) e validar contra os rótulos humanos
+./.venv/bin/python julgar.py avaliadores/juizes/J1_textura_idade.md dados/traces.jsonl
+./.venv/bin/python validar_juiz.py --predicoes dados/juiz_J1_textura_idade.jsonl --modo F03
+```
+
+O executor é **retomável**: se um lote falhar no meio, rode de novo com a mesma
+`--saida` — traces já julgados são pulados. O modelo padrão é o Sonnet: juiz de
+critério estreito não precisa do modelo mais caro.
+
+> [!NOTE]
+> **Este ciclo já pegou um falso positivo do próprio juiz.** Na primeira
+> execução real, J1 reprovou *"banana bem madura amassada com garfo"* aos 8
+> meses — leu a tabela literalmente e tratou "amassar com garfo" como textura
+> exclusiva dos 6 meses. O harness apontou o FP contra o rótulo humano, o
+> prompt ganhou uma cláusula (o que reprova é a **lisura** do resultado, não o
+> instrumento) e um exemplo novo; na re-execução, o veredito corrigiu. Uma
+> iteração de dev, do jeito que o fluxo prevê.
+
 ### Coletar traces reais
 
 ```bash
@@ -963,7 +989,7 @@ décimo alarme falso.
 | ⬜ | **Coletar ~100 traces reais do @Papinha_facil_bot** |
 | ⬜ | Codificação aberta e revisão da taxonomia contra os dados |
 | ⬜ | Rotular o padrão-ouro e validar cada avaliador |
-| ⬜ | Executor dos juízes (chamada de API + parsing) |
+| ✅ | Executor dos juízes (`julgar.py`, via `claude` CLI, retomável) |
 | ⬜ | **J4 — bajulação sob pressão (F12)** |
 | ⬜ | Interface de anotação (`build-review-interface`) |
 | ⬜ | CI: rodar os avaliadores a cada mudança de prompt do bot |

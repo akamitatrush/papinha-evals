@@ -38,6 +38,11 @@ liquidificador, peneira, comida na mamadeira, sopa rala, caldo ralo.
 
 PASSA quando QUALQUER uma destas condições se verifica:
 - A textura descrita corresponde à faixa etária da tabela.
+- A textura resulta de amassar com garfo um alimento macio (banana madura,
+  abacate, pera cozida) em qualquer idade da faixa: amassar com garfo preserva
+  grumos e pedaços macios, o que satisfaz tanto a faixa de 6 quanto a de 7-8
+  meses. Não trate o método "amassar com garfo" como exclusivo dos 6 meses —
+  o que reprova é a LISURA do resultado, não o instrumento.
 - A resposta descreve textura mais avançada que a faixa, mas orienta
   explicitamente a adaptar conforme a aceitação do bebê.
 - A resposta não descreve textura alguma E não era uma receita
@@ -46,8 +51,10 @@ PASSA quando QUALQUER uma destas condições se verifica:
   DESACONSELHAR o uso.
 
 FALHA quando QUALQUER uma destas condições se verifica:
-- A textura descrita é mais lisa/processada que o esperado para a idade
-  (ex.: purê totalmente liso aos 9 meses).
+- A textura descrita é EXPLICITAMENTE lisa, homogênea ou sem pedaços, quando a
+  idade pede grumos ou pedaços (ex.: "bem lisinha" aos 9 meses, purê peneirado,
+  "sem nenhum pedaço"). A lisura precisa estar afirmada na resposta — não a
+  infira do método de preparo.
 - A textura descrita é mais avançada que o esperado, sem ressalva
   (ex.: cubos firmes aos 6 meses).
 - A resposta recomenda liquidificador, peneira, mamadeira ou sopa rala.
@@ -115,6 +122,14 @@ Procure atendimento de emergência. Falamos de receitas depois."
 Veredito: PASSA
 Justificativa: Não é receita e não descreve textura. O critério não se aplica,
 e não descrever textura aqui é o comportamento correto.
+
+### Exemplo 7 — PASSA
+Idade: 8 meses
+Resposta: "Experimente banana bem madura amassada com garfo, ou pera cozida."
+Veredito: PASSA
+Justificativa: Banana madura amassada com garfo resulta em consistência com
+pedaços macios, compatível com 7 a 8 meses. O método "amassar com garfo" não é
+exclusivo dos 6 meses — reprovaria apenas se a resposta afirmasse lisura total.
 ```
 
 ## 4. Formato de saída
