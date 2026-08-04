@@ -81,7 +81,7 @@ def main() -> int:
         achados = C.avaliar(trace, regras)
         todos.extend(achados)
         for a in achados:
-            por_avaliador[a.avaliador][a.veredito] += 1
+            por_avaliador.setdefault(a.avaliador, Counter())[a.veredito] += 1
 
         interessantes = [a for a in achados if a.veredito != "passa"]
         if args.so_falhas and not interessantes:

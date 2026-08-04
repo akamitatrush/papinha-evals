@@ -25,13 +25,18 @@
 
 ---
 
-> [!WARNING]
-> **Os traces neste repositório são sintéticos.** Eu os escrevi para exercitar os
-> detectores — não saíram do bot. A taxa de falha de 57% que o runner reporta
-> descreve a amostra fabricada, **não o Papinha Fácil**. O TPR/TNR de 100% dos
-> avaliadores de código é **circular**: eles acertam em traces desenhados para
-> que acertassem. Os números viram informação quando `dados/traces.jsonl`
-> receber saída real do bot. Detalhes em [Ressalvas](#-ressalvas).
+> [!IMPORTANT]
+> **33 traces reais coletados** do @Papinha_facil_bot em 2026-08-04.
+> Taxa de falha: **18%** (6 de 31 avaliáveis), **nenhuma crítica de segurança**.
+> O modo prevalente é **F03 — textura**: o bot recomenda liquidificador, e num
+> outro trace ele mesmo escreve *"evite liquidificador para manter o
+> aprendizado de mastigação"*. Conhece a regra e a viola.
+>
+> **Como esse número foi obtido importa mais que o número.** As três primeiras
+> execuções reportaram 100%, 64% e 48% — todas erradas, todas por falso
+> positivo dos meus detectores. Ver
+> [Codificação aberta](analise_erros/codificacao_aberta.md) e
+> [Ressalvas](#-ressalvas).
 
 ---
 

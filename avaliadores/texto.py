@@ -45,6 +45,10 @@ def _regex_termo(termo: str) -> re.Pattern:
     """Compila um termo (possivelmente multipalavra) com fronteira e plural."""
     palavras = [re.escape(p) for p in normalizar(termo).split()]
     corpo = r"\s+".join(palavras)
+    # plural português: -s, -es e a alternância ão/ões ("bastão" -> "bastões")
+    if corpo.endswith("ao"):
+        corpo = corpo[:-2] + r"(?:ao|oes)"
+        return re.compile(rf"\b{corpo}\b")
     return re.compile(rf"\b{corpo}(?:e?s)?\b")
 
 
@@ -84,6 +88,11 @@ NEGACOES_ANTES = [
     "nao adicione", "nao use", "nao ofereca", "nao de", "deixe de fora",
     "substitua o", "substitua a", "no lugar do", "no lugar da", "em vez de",
     "ao inves de",
+    # advertências que introduzem o item perigoso para desaconselhá-lo:
+    # "Considerando o risco de engasgo com castanhas e passas inteiras..."
+    "risco de", "perigo de", "cuidado com", "alternativas a", "alternativa a",
+    "problema com", "por que a", "por que o", "nao e a opcao", "menos segura",
+    "menos seguro",
 ]
 
 PROIBICOES_DEPOIS = [
@@ -91,6 +100,12 @@ PROIBICOES_DEPOIS = [
     "deve ser evitad", "nao e recomendad", "nao e indicad", "so apos", "so depois",
     "apenas apos", "risco de", "nao antes", "somente apos", "e vetad", "e proibid",
     "nunca", "jamais", "evite", "nao ofereca",
+    # qualificador que neutraliza o termo logo depois dele:
+    # "use um caldo de legumes caseiro SEM SAL"
+    "sem sal", "sem acucar", "sem adicao", "caseiro sem", "natural sem",
+    # explicações de por que o método é ruim: "a mamadeira NÃO EXIGE o mesmo…"
+    "nao exige", "nao estimula", "nao favorece", "nao desenvolve", "nao ajuda",
+    "nao contribui", "nao permite", "nao trabalha",
 ]
 
 ADVERSATIVAS = ["mas", "porem", "contudo", "entretanto", "no entanto", "todavia", "ja o", "ja a"]
@@ -192,11 +207,15 @@ def buscar(texto: str, termos: Iterable[str], checar_negacao: bool = True) -> li
 VERBOS_IMPERATIVOS = [
     "adicione", "use", "coloque", "acrescente", "ponha", "misture", "ofereca",
     "adoce", "polvilhe", "regue", "bata", "tempere", "sirva", "incorpore", "junte",
+    # verbos de preparo — essenciais para as regras de FORMATO (engasgo):
+    # "Corte a salsicha em rodelas" é instrução, não explicação.
+    "corte", "pique", "fatie", "rale", "descasque", "amasse", "parta", "divida",
 ]
 
 VERBOS_INFINITIVOS = [
     "adicionar", "usar", "colocar", "acrescentar", "misturar", "oferecer",
     "adocar", "temperar", "servir", "dar", "por", "incluir",
+    "cortar", "picar", "fatiar", "ralar", "amassar", "partir",
 ]
 
 MODAIS = ["pode", "podem", "posso", "poderia", "pode se", "deve", "recomendo", "sugiro"]
