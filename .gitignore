@@ -4,3 +4,8 @@ __pycache__/
 .pytest_cache/
 achados.jsonl
 resultados.jsonl
+
+# credenciais e sessão do Telegram — NUNCA commitar
+*.session
+*.session-journal
+result.json

@@ -11,7 +11,7 @@
 ![CI](https://github.com/akamitatrush/papinha-evals/actions/workflows/testes.yml/badge.svg)
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![YAML](https://img.shields.io/badge/YAML-regras-CB171E?style=for-the-badge&logo=yaml&logoColor=white)
-![pytest](https://img.shields.io/badge/pytest-51_passando-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)
+![pytest](https://img.shields.io/badge/pytest-63_passando-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)
 ![Licença](https://img.shields.io/badge/licença-MIT-2A9D8F?style=for-the-badge)
 
 ![Avaliadores](https://img.shields.io/badge/avaliadores_de_código-10-2D6A9F?style=flat-square)
@@ -164,7 +164,7 @@ flowchart LR
 Essa separação é a tese da aula em forma de arquitetura: **avaliação não pode
 ficar refém de quem sabe abrir um terminal.** Adicionar um alimento proibido ou
 um formato de risco é editar uma lista em YAML — o especialista do domínio faz
-sozinho, e os 51 testes garantem que a mecânica continua correta.
+sozinho, e os 63 testes garantem que a mecânica continua correta.
 
 ---
 
@@ -250,6 +250,10 @@ papinha-evals/
 │       ├── J3_manejo_alergenicos.md    ⚖️ F04 — protocolo de alergênicos
 │       └── J4_bajulacao_pressao.md     ⚖️ F12 — cede à pressão do usuário?
 │
+├── coleta/
+│   ├── importar_telegram.py       📥 export do Telegram Desktop → traces.jsonl
+│   └── enviar_consultas.py        🤖 automação via Telethon (opcional)
+│
 ├── dados/
 │   ├── consultas.jsonl            📥 45 consultas · 17 dimensões
 │   ├── traces_exemplo.jsonl       🧪 14 traces SINTÉTICOS
@@ -260,7 +264,8 @@ papinha-evals/
 │   └── rotulos.csv                🎯 padrão-ouro humano
 │
 ├── tests/
-│   └── test_avaliadores.py        🧪 51 testes
+│   ├── test_avaliadores.py        🧪 51 testes dos avaliadores
+│   └── test_importar_telegram.py  🧪 12 testes do conversor
 │
 ├── anotar.html                    ✍️ interface de anotação — abre no navegador,
 │                                     zero dependências, exporta rotulos.csv
@@ -752,7 +757,7 @@ python3 -m venv --system-site-packages .venv
 
 <div align="center">
 
-`51 passed in 0.19s` ✅
+`63 passed in 0.45s` ✅
 
 </div>
 
@@ -877,14 +882,65 @@ open anotar.html          # macOS
 > Nada sai do navegador: sem servidor, sem telemetria, sem dependências. Dá
 > para mandar o arquivo no grupo da turma e cada pessoa rotula um lote.
 
-### Coletar traces reais
+### Coletar traces reais — três rotas
+
+```mermaid
+flowchart LR
+    A["💬 <b>Conversa</b><br/>@Papinha_facil_bot"] --> B["📱 Rota 1<br/><b>colar na mão</b>"]
+    A --> C["🖥️ Rota 2 ★<br/><b>export do Desktop</b><br/>+ importar_telegram.py"]
+    A --> D["🤖 Rota 3<br/><b>Telethon</b><br/>enviar_consultas.py"]
+    B --> E["<b>dados/traces.jsonl</b>"]
+    C --> E
+    D --> E
+
+    classDef n fill:#495057,color:#fff,stroke:#212529,stroke-width:2px
+    classDef rec fill:#2A9D8F,color:#fff,stroke:#1D6F65,stroke-width:2px
+    classDef alvo fill:#E9C46A,color:#1A1A1A,stroke:#C9A227,stroke-width:2px
+    class A,B,D n
+    class C rec
+    class E alvo
+```
+
+O bot é do professor — a API de bots do Telegram só serve ao dono. As três
+rotas passam pela **sua** conta, que é exatamente o uso que a aula pede.
+
+**Rota 1 — colar na mão.** Funciona, mas com 45 consultas cansa e convida erro
+de cópia.
+
+**Rota 2 — export do Telegram Desktop (★ recomendada).** Converse com o bot,
+depois: chat do bot → ⋮ → *Exportar histórico da conversa* → formato *JSON* →
+sem mídia. Sai um `result.json`; o conversor faz o resto:
 
 ```bash
-# 1. rode as consultas no @Papinha_facil_bot (Telegram)
-cat dados/consultas.jsonl | head -5
+./.venv/bin/python coleta/importar_telegram.py result.json --saida dados/traces.jsonl
+```
 
-# 2. cole cada troca em dados/traces.jsonl
-# 3. rode
+Ele pareia cada mensagem sua com as respostas do bot, agrupa respostas em
+várias mensagens, e **casa o texto com `dados/consultas.jsonl`** (exato ou
+fuzzy) para herdar `query_id` e `idade_meses`. Perguntas fora do kit entram
+como avulsas, com a idade extraída por regex. Zero credenciais.
+
+**Rota 3 — automação total (Telethon).** Um script envia as consultas pela sua
+conta e captura as respostas sozinho, com suporte a multiturno (q034) e
+retomada:
+
+```bash
+./.venv/bin/pip install telethon
+export TELEGRAM_API_ID=...      # crie em https://my.telegram.org/apps
+export TELEGRAM_API_HASH=...
+./.venv/bin/python coleta/enviar_consultas.py --limite 5   # teste primeiro
+```
+
+No primeiro uso o Telethon pede o código de login que chega no seu Telegram —
+é você autenticando você; o script nunca vê sua senha. Intervalo de 8s entre
+consultas por padrão: o bot é compartilhado com a turma inteira.
+
+> [!NOTE]
+> `*.session` e `result.json` estão no `.gitignore` — sessão do Telegram e
+> histórico bruto de conversa não entram em repositório público.
+
+```bash
+# depois de qualquer rota:
 ./.venv/bin/python rodar_evals.py dados/traces.jsonl --saida achados.jsonl
 ```
 
@@ -1004,7 +1060,8 @@ Quando `TPR + TNR ≈ 1`, o avaliador não é informativo e a inversão não exi
 | F09 completude | 5 | receita completa, sem quantidade, **regressão de emergência** |
 | F10 / F13 | 4 | idioma, fuga de domínio |
 | Integração | 3 | todos os avaliadores, resposta de referência limpa |
-| | **51** | |
+| Conversor do Telegram | 12 | parsing do export, pareamento, casamento fuzzy, CLI ponta a ponta |
+| | **63** | |
 
 </div>
 
@@ -1022,17 +1079,17 @@ décimo alarme falso.
 | Status | Item |
 |:---:|:---|
 | ✅ | Base de regras de segurança 6-12 meses |
-| ✅ | 10 avaliadores de código + 51 testes |
+| ✅ | 10 avaliadores de código + 63 testes |
 | ✅ | 4 prompts de juiz na anatomia dos 4 componentes |
 | ✅ | Harness de validação com TPR/TNR e correção de viés |
 | ✅ | 45 consultas em 17 dimensões |
-| ⬜ | **Coletar ~100 traces reais do @Papinha_facil_bot** |
+| 🔶 | **Coletar ~100 traces reais** — ferramentas prontas em `coleta/`, falta executar |
 | ⬜ | Codificação aberta e revisão da taxonomia contra os dados |
 | ⬜ | Rotular o padrão-ouro e validar cada avaliador |
 | ✅ | Executor dos juízes (`julgar.py`, via `claude` CLI, retomável) |
 | ✅ | J4 — bajulação sob pressão (F12) |
 | ✅ | Interface de anotação (`anotar.html`, navegador puro, exporta o CSV) |
-| ✅ | CI no GitHub Actions: 51 testes + fumaça de runner, juízes e splits |
+| ✅ | CI no GitHub Actions: 63 testes + fumaça de runner, juízes e splits |
 
 </div>
 
