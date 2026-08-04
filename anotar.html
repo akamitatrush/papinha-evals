@@ -305,6 +305,66 @@ main {
   padding: 2rem 1.5rem 7rem;
 }
 
+/* ── duas colunas em tela larga ────────────────────────────────────────────
+   O problema de rotular numa coluna só: você lê a resposta do bot, rola até
+   os botões, e no caminho esquece o que leu. Aqui a conversa rola à esquerda
+   e as perguntas ficam paradas à direita — os dois na tela ao mesmo tempo. */
+@media (min-width: 1040px) {
+  main { max-width: 84rem; }
+  .topo-conteudo { max-width: 84rem; }   /* senão o cabeçalho fica mais estreito que o conteúdo */
+  #troca {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 25rem;
+    gap: 2.5rem;
+    align-items: start;
+  }
+  .coluna-conversa { min-width: 0; }
+  .coluna-juizo {
+    position: sticky;
+    top: 6.5rem;                 /* abaixo do cabeçalho fixo */
+    max-height: calc(100vh - 9rem);
+    overflow-y: auto;
+    padding-right: .25rem;
+    scrollbar-width: thin;
+  }
+  .coluna-juizo .rotulos { margin-top: 0; }
+  .coluna-juizo .anotacao { margin-top: 1.25rem; }
+  /* Em duas colunas o espaço é estreito: botões embaixo da pergunta. */
+  .modo {
+    grid-template-columns: 2.75rem 1fr;
+    row-gap: .5rem;
+    padding: .7rem 0;
+  }
+  .modo .segmentado { grid-column: 2; justify-self: start; }
+}
+
+/* Cabeçalho da coluna de juízo: quantas perguntas ainda faltam neste trace. */
+.juizo-topo {
+  display: flex;
+  align-items: baseline;
+  gap: .6rem;
+  padding-bottom: .6rem;
+  margin-bottom: .25rem;
+  border-bottom: 1px solid var(--regua-forte);
+}
+.juizo-topo .restam {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: .75rem;
+  color: var(--tinta-meia);
+  font-variant-numeric: tabular-nums;
+}
+.juizo-topo .restam.zero { color: var(--passa); }
+
+/* Piscar o termo no texto quando o rotulador clica no selo "encostou". */
+@keyframes piscar {
+  0%, 100% { background: var(--marca-bg); }
+  35%      { background: var(--marca-linha); }
+}
+mark.apontado { animation: piscar 1.1s ease-in-out 2; }
+.selo-jogo { cursor: pointer; }
+.selo-jogo:hover { background: var(--marca-bg); }
+
 .troca { animation: entrar .32s cubic-bezier(.2,.7,.3,1) both; }
 @keyframes entrar { from { opacity: 0; transform: translateY(8px) } }
 
@@ -668,25 +728,34 @@ kbd {
 <!-- ═══ CORPO ═══ -->
 <main class="escondido" id="app">
   <div id="troca">
-    <div class="turno">
-      <div class="turno-rotulo"><span class="etiqueta">Cuidador</span></div>
-      <div class="balao usuario" id="entrada"></div>
-    </div>
-
-    <div class="turno">
-      <div class="turno-rotulo">
-        <span class="etiqueta">Papinha Fácil</span>
-        <span class="contador-marcas" id="marcas"></span>
+    <div class="coluna-conversa">
+      <div class="turno">
+        <div class="turno-rotulo"><span class="etiqueta">Cuidador</span></div>
+        <div class="balao usuario" id="entrada"></div>
       </div>
-      <div class="balao bot" id="saida"></div>
+
+      <div class="turno">
+        <div class="turno-rotulo">
+          <span class="etiqueta">Papinha Fácil</span>
+          <span class="contador-marcas" id="marcas"></span>
+        </div>
+        <div class="balao bot" id="saida"></div>
+      </div>
     </div>
 
-    <div class="rotulos" id="rotulos"></div>
+    <div class="coluna-juizo">
+      <div class="juizo-topo">
+        <span class="etiqueta">O bot cometeu algum destes?</span>
+        <span class="restam" id="restam"></span>
+      </div>
 
-    <div class="anotacao">
-      <span class="etiqueta">Codificação aberta — o que deu errado primeiro?</span>
-      <textarea id="nota" rows="2"
-        placeholder="Observação, não explicação. “sugeriu uva inteira”, não “o modelo não entende engasgo”."></textarea>
+      <div class="rotulos" id="rotulos"></div>
+
+      <div class="anotacao">
+        <span class="etiqueta">Codificação aberta — o que deu errado primeiro?</span>
+        <textarea id="nota" rows="2"
+          placeholder="Observação, não explicação. “sugeriu uva inteira”, não “o modelo não entende engasgo”."></textarea>
+      </div>
     </div>
   </div>
 </main>
@@ -920,8 +989,14 @@ function render() {
     linha.innerHTML =
       `<span class="modo-codigo">${codigo}</span>` +
       `<span class="modo-nome">${descricao}<span class="modo-tecla">${i + 1}</span>` +
-      (emJogo ? `<span class="selo-jogo">encostou</span>` : "") +
+      (emJogo ? `<span class="selo-jogo" data-modo="${codigo}"
+                       title="Ver no texto o termo que acendeu este modo">encostou</span>` : "") +
       `<span class="modo-pergunta">${pergunta}</span></span>`;
+    // Clicar no selo leva ao trecho que acendeu o modo: a pergunta e a
+    // evidência param de ficar em pontas opostas da página.
+    if (emJogo) {
+      linha.querySelector(".selo-jogo").onclick = () => apontar(termos || []);
+    }
     const seg = document.createElement("div");
     seg.className = "segmentado";
     for (const valor of ["passa", "falha", "na", "duvida"]) {
@@ -938,6 +1013,11 @@ function render() {
     linha.appendChild(seg);
     grade.appendChild(linha);
   });
+
+  const faltam = MODOS.filter(([c]) => !r[c]).length;
+  const el = $("restam");
+  el.textContent = faltam ? `faltam ${faltam}` : "completo";
+  el.classList.toggle("zero", faltam === 0);
 
   $("nota").value = r.nota || "";
 
@@ -959,6 +1039,19 @@ function render() {
   troca.classList.remove("troca");
   void troca.offsetWidth;
   troca.classList.add("troca");
+}
+
+/** Rola até o primeiro termo do modo dentro da resposta e o faz piscar. */
+function apontar(termos) {
+  const marcas = [...$("saida").querySelectorAll("mark")];
+  const alvo = marcas.find(m =>
+    termos.some(t => normalizar(m.textContent).includes(normalizar(t)))
+  ) || marcas[0];
+  if (!alvo) { aviso("O termo não está destacado nesta resposta"); return; }
+  alvo.scrollIntoView({ behavior: "smooth", block: "center" });
+  document.querySelectorAll("mark.apontado").forEach(m => m.classList.remove("apontado"));
+  void alvo.offsetWidth;                    // reinicia a animação
+  alvo.classList.add("apontado");
 }
 
 function aplicar(codigo, valor) {
