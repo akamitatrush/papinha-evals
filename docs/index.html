@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Papinha Evals — o eval errou antes do bot</title>
+<meta name="description" content="Avaliadores automatizados para um chatbot de introdução alimentar infantil. Quatro rodadas: 100%, 64%, 48%, 18% de falha. As três primeiras estavam erradas.">
+<meta property="og:title" content="Papinha Evals — o eval errou antes do bot">
+<meta property="og:description" content="Quatro rodadas de medição: 100%, 64%, 48%, 18%. Toda correção foi no avaliador, nenhuma no bot.">
+<style>
+/* ══════════════════════════════════════════════════════════════════════════
+   PRONTUÁRIO QUENTE — a mesma linguagem das duas interfaces do projeto.
+   Papel morno, serifada de leitura, cor cirúrgica só onde carrega sentido.
+   ══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --papel:#F7F4EE; --superficie:#FFFDF9; --tinta:#1F1B16; --tinta-meia:#6B6259;
+  --tinta-fina:#9C9287; --regua:#E4DDD2; --regua-forte:#D2C8B8; --acento:#1F4E5F;
+  --real:#A8321F; --ok:#2E6F4E; --pendente:#B26B12; --marca:#FBEBBE; --marca-l:#D9A72C;
+  --serifada:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","Hoefler Text",Georgia,serif;
+  --mono:"SF Mono","JetBrains Mono","IBM Plex Mono","Cascadia Mono",ui-monospace,Menlo,monospace;
+  --sans:Optima,"Avenir Next","Segoe UI",Helvetica,sans-serif;
+  --grao:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+}
+@media (prefers-color-scheme:dark){:root:where(:not([data-tema="claro"])){
+  --papel:#14120E; --superficie:#1B1915; --tinta:#EDE7DC; --tinta-meia:#A79E90;
+  --tinta-fina:#736B60; --regua:#2E2A23; --regua-forte:#413B31; --acento:#7FBECE;
+  --real:#EE7259; --ok:#63C48C; --pendente:#D99A3C; --marca:#4E3A08; --marca-l:#8A6A16;
+  color-scheme:dark;}}
+:root[data-tema="escuro"]{
+  --papel:#14120E; --superficie:#1B1915; --tinta:#EDE7DC; --tinta-meia:#A79E90;
+  --tinta-fina:#736B60; --regua:#2E2A23; --regua-forte:#413B31; --acento:#7FBECE;
+  --real:#EE7259; --ok:#63C48C; --pendente:#D99A3C; --marca:#4E3A08; --marca-l:#8A6A16;
+  color-scheme:dark;}
+
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--papel);background-image:var(--grao);
+  color:var(--tinta);line-height:1.55;-webkit-font-smoothing:antialiased}
+.folha{max-width:54rem;margin:0 auto;padding:0 1.5rem}
+a{color:var(--acento)}
+.etiqueta{font-family:var(--mono);font-size:.625rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--tinta-fina)}
+
+/* ── abertura ────────────────────────────────────────────────────────── */
+.capa{padding:6rem 0 4rem;animation:subir .7s cubic-bezier(.2,.7,.3,1) both}
+@keyframes subir{from{opacity:0;transform:translateY(16px)}}
+h1{font-family:var(--serifada);font-weight:400;font-size:clamp(2.4rem,7vw,4rem);
+  line-height:1.04;letter-spacing:-.025em;margin:.5rem 0 1.25rem;max-width:20ch}
+h1 em{font-style:italic;color:var(--acento)}
+.chamada{font-family:var(--serifada);font-size:clamp(1.05rem,2.2vw,1.3rem);
+  line-height:1.6;color:var(--tinta-meia);max-width:38rem}
+.chamada b{color:var(--tinta);font-weight:400;
+  background:linear-gradient(transparent 62%,var(--marca) 62%);
+  border-bottom:1px solid var(--marca-l)}
+
+/* ── a sequência: o gráfico que é a tese ─────────────────────────────── */
+.sequencia{margin:4rem 0;padding:2rem 0;border-top:1px solid var(--regua);
+  border-bottom:1px solid var(--regua)}
+.passos{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--regua);border:1px solid var(--regua);margin:1.5rem 0 1rem}
+.passo{background:var(--superficie);padding:1.1rem .9rem;position:relative;
+  animation:passoEntra .5s cubic-bezier(.2,.7,.3,1) both}
+@keyframes passoEntra{from{opacity:0;transform:translateY(10px)}}
+.passo:nth-child(1){animation-delay:.10s}.passo:nth-child(2){animation-delay:.22s}
+.passo:nth-child(3){animation-delay:.34s}.passo:nth-child(4){animation-delay:.46s}
+.passo .taxa{font-family:var(--mono);font-size:clamp(1.5rem,4vw,2.1rem);font-weight:600;
+  letter-spacing:-.04em;font-variant-numeric:tabular-nums;line-height:1;
+  color:var(--real);transition:color .3s}
+.passo:last-child .taxa{color:var(--ok)}
+.passo .quando{font-size:.75rem;color:var(--tinta-fina);margin-top:.35rem;
+  font-family:var(--mono)}
+.passo .oque{font-size:.8125rem;color:var(--tinta-meia);margin-top:.5rem;line-height:1.45}
+.veredito-seq{font-family:var(--serifada);font-size:1.15rem;line-height:1.55;
+  max-width:40rem;color:var(--tinta)}
+
+/* ── seções ──────────────────────────────────────────────────────────── */
+section{padding:3.5rem 0;border-top:1px solid var(--regua)}
+h2{font-family:var(--serifada);font-weight:400;font-size:clamp(1.5rem,3.5vw,2rem);
+  letter-spacing:-.015em;line-height:1.15;margin:.35rem 0 1rem;max-width:24ch}
+p{max-width:40rem;margin-bottom:1rem;font-size:1.0625rem}
+p.miudo{font-size:.9375rem;color:var(--tinta-meia)}
+code{font-family:var(--mono);font-size:.875em;background:var(--superficie);
+  padding:.1em .35em;border:1px solid var(--regua);border-radius:2px}
+
+/* ── cartões de artefato ─────────────────────────────────────────────── */
+.artefatos{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));
+  gap:1rem;margin-top:1.75rem}
+.cartao{display:block;text-decoration:none;color:inherit;background:var(--superficie);
+  border:1px solid var(--regua-forte);border-radius:2px;padding:1.35rem;
+  transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s,border-color .2s}
+.cartao:hover{transform:translateY(-3px);border-color:var(--acento);
+  box-shadow:0 2px 4px rgba(0,0,0,.05),0 18px 40px -18px rgba(31,27,22,.35)}
+.cartao .tipo{font-family:var(--mono);font-size:.625rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--acento)}
+.cartao h3{font-family:var(--serifada);font-weight:400;font-size:1.2rem;
+  margin:.5rem 0 .4rem}
+.cartao p{font-size:.875rem;color:var(--tinta-meia);margin:0}
+.cartao .seta{display:inline-block;margin-top:.75rem;font-family:var(--mono);
+  font-size:.75rem;color:var(--acento);transition:transform .2s}
+.cartao:hover .seta{transform:translateX(4px)}
+
+/* ── achados ─────────────────────────────────────────────────────────── */
+.achado{border-left:2px solid var(--regua-forte);padding:.35rem 0 .35rem 1.15rem;
+  margin-bottom:1.5rem;max-width:42rem}
+.achado.critico{border-left-color:var(--real)}
+.achado .cabeca{font-family:var(--mono);font-size:.75rem;color:var(--tinta-fina);
+  margin-bottom:.3rem}
+.achado .fala{font-family:var(--serifada);font-size:1.05rem;line-height:1.55;
+  font-style:italic}
+.achado .fala mark{background:linear-gradient(transparent 62%,var(--marca) 62%);
+  color:inherit;border-bottom:1px solid var(--marca-l)}
+.achado .glosa{font-size:.9375rem;color:var(--tinta-meia);margin-top:.5rem}
+
+/* ── ressalva ────────────────────────────────────────────────────────── */
+.ressalva{background:var(--superficie);border-left:3px solid var(--pendente);
+  padding:1.25rem 1.4rem;margin:1.5rem 0;max-width:42rem}
+.ressalva b{display:block;margin-bottom:.4rem;font-family:var(--serifada);font-size:1.1rem}
+.ressalva p{font-size:.9375rem;color:var(--tinta-meia);margin:0}
+
+/* ── números ─────────────────────────────────────────────────────────── */
+.numeros{display:grid;grid-template-columns:repeat(auto-fit,minmax(7rem,1fr));
+  gap:1px;background:var(--regua);border:1px solid var(--regua);margin-top:1.5rem}
+.numeros div{background:var(--superficie);padding:.9rem 1rem}
+.numeros .v{font-family:var(--mono);font-size:1.5rem;font-weight:600;
+  letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.1}
+.numeros .r{font-size:.75rem;color:var(--tinta-meia);margin-top:.15rem}
+
+footer{padding:3rem 0 5rem;border-top:1px solid var(--regua);font-size:.875rem;
+  color:var(--tinta-meia);line-height:1.7}
+footer a{text-decoration:none;border-bottom:1px solid var(--regua-forte)}
+footer a:hover{border-bottom-color:var(--acento)}
+.aviso-saude{margin-top:1.5rem;padding-left:1rem;border-left:2px solid var(--regua-forte);
+  font-size:.8125rem;color:var(--tinta-fina)}
+
+.tema{position:fixed;top:1rem;right:1rem;z-index:10;width:2.1rem;height:2.1rem;
+  display:grid;place-items:center;border:1px solid var(--regua-forte);border-radius:50%;
+  background:var(--superficie);color:var(--tinta-meia);cursor:pointer;
+  transition:transform .3s,color .2s}
+.tema:hover{transform:rotate(-25deg);color:var(--tinta)}
+
+@media (max-width:640px){.passos{grid-template-columns:repeat(2,1fr)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<button class="tema" id="tema" aria-label="Alternar tema">◐</button>
+
+<div class="folha">
+
+  <header class="capa">
+    <span class="etiqueta">Avaliação de sistemas de IA generativa</span>
+    <h1>O <em>eval</em> errou antes do bot</h1>
+    <p class="chamada">
+      Construímos avaliadores automatizados para o <b>@Papinha_facil_bot</b>, um
+      chatbot que sugere receitas para bebês de 6 a 12 meses. Medimos a taxa de
+      falha quatro vezes. <b>Só a última descrevia o bot.</b>
+    </p>
+  </header>
+
+  <!-- ═══ A TESE ═══ -->
+  <div class="sequencia">
+    <span class="etiqueta">Quatro medições do mesmo bot</span>
+    <div class="passos">
+      <div class="passo">
+        <div class="taxa">100%</div>
+        <div class="quando">rodada 1</div>
+        <div class="oque">Detector acusava “não use mel” como se fosse sugestão de mel.</div>
+      </div>
+      <div class="passo">
+        <div class="taxa">64%</div>
+        <div class="quando">rodada 2</div>
+        <div class="oque">Regras de engasgo acusavam o parágrafo que alertava sobre engasgo.</div>
+      </div>
+      <div class="passo">
+        <div class="taxa">48%</div>
+        <div class="quando">rodada 3</div>
+        <div class="oque">Bug de plural: “bastões” não casava com “bastão”, e o corte seguro sumia.</div>
+      </div>
+      <div class="passo">
+        <div class="taxa">18%</div>
+        <div class="quando">rodada 4</div>
+        <div class="oque">Enfim o bot. Seis falhas reais em 31 traces avaliáveis.</div>
+      </div>
+    </div>
+    <p class="veredito-seq">
+      Nenhuma dessas correções tocou o chatbot. <strong>Todas foram no
+      avaliador.</strong> Um eval não medido mede a si próprio.
+    </p>
+  </div>
+
+  <!-- ═══ O PROBLEMA ═══ -->
+  <section id="problema">
+    <span class="etiqueta">Por que este domínio</span>
+    <h2>Quando o produto de IA erra, o custo não é uma resposta ruim</h2>
+    <p>
+      A partir dos 6 meses começa a introdução alimentar. Errar aqui é botulismo
+      (mel antes de 1 ano), asfixia (uva inteira tem o diâmetro exato da traqueia
+      infantil) ou anafilaxia. É um domínio onde <strong>a falha crítica é
+      objetivamente verificável</strong> — não é questão de gosto se mel antes de
+      1 ano é errado.
+    </p>
+    <p class="miudo">
+      Isso permite detectores determinísticos de alta precisão para a camada de
+      segurança, e reserva o LLM-como-juiz para o que é genuinamente
+      interpretativo: se “amassado com pedaços macios” é adequado aos 8 meses, se
+      uma restrição declarada como “APLV” foi respeitada quando a receita pede
+      requeijão.
+    </p>
+  </section>
+
+  <!-- ═══ A ARMADILHA ═══ -->
+  <section id="armadilha">
+    <span class="etiqueta">A armadilha central</span>
+    <h2>Quanto melhor o bot fica, mais o detector acusa</h2>
+    <p>
+      <code>"mel" in texto</code> acusa <strong>melão</strong>, <strong>melancia</strong>
+      e <strong>caramelo</strong>. <code>"sal"</code> acusa <strong>salada</strong>,
+      <strong>salsinha</strong> e <strong>salmão</strong>. Isso se resolve com
+      fronteira de palavra. O problema seguinte não.
+    </p>
+    <div class="achado">
+      <div class="cabeca">resposta correta do bot · acusada como falha</div>
+      <div class="fala">“<mark>Não use mel</mark> — é contraindicado antes de 1 ano por risco de botulismo.”</div>
+      <div class="glosa">
+        O bot está certo. O detector conta a palavra e reprova. Quanto mais o bot
+        melhora em segurança, mais ele fala sobre alimentos proibidos — e mais a
+        métrica piora. O número anda para trás enquanto o produto melhora.
+      </div>
+    </div>
+    <p>
+      A correção não foi remendar caso a caso. Foi mudar a pergunta: o modo de
+      falha nunca foi <em>“o bot mencionou mel”</em>, é <em>“o bot recomendou
+      mel”</em>. A distinção, em português, é morfológica —
+      <strong>“Use mel”</strong> é imperativo e instrui;
+      <strong>“Adicionar sal pode mascarar sabores”</strong> é infinitivo-sujeito
+      e explica.
+    </p>
+  </section>
+
+  <!-- ═══ O QUE O BOT ERRA ═══ -->
+  <section id="achados">
+    <span class="etiqueta">33 traces reais, coletados no Telegram</span>
+    <h2>O que o Papinha Fácil de fato erra</h2>
+    <div class="numeros">
+      <div><div class="v">33</div><div class="r">traces reais</div></div>
+      <div><div class="v">6</div><div class="r">falhas confirmadas</div></div>
+      <div><div class="v">0</div><div class="r">críticas de segurança</div></div>
+      <div><div class="v">71</div><div class="r">testes do próprio eval</div></div>
+    </div>
+    <p style="margin-top:1.75rem">
+      O bot é bom. Recusou mel, recusou sal, recusou medicar, encaminhou ao
+      pronto-socorro e segurou firme quando o usuário apelou para a sogra. Sobre
+      amendoim escreveu <em>“NUNCA, em hipótese alguma, ofereça amendoim
+      inteiro”</em> e explicou a pasta diluída. O achado mais forte não é uma
+      falha de conhecimento:
+    </p>
+    <div class="achado critico">
+      <div class="cabeca">t102 · pergunta sobre sal</div>
+      <div class="fala">“Amasse os legumes com um garfo — <mark>evite liquidificador</mark> para manter a textura e o aprendizado de mastigação.”</div>
+    </div>
+    <div class="achado critico">
+      <div class="cabeca">t107 · três traces depois, pergunta sobre textura</div>
+      <div class="fala">“Bater tudo no <mark>liquidificador</mark> para deixar bem lisinho <mark>é uma ótima ideia!</mark>”</div>
+      <div class="glosa">
+        Mesmo bot, mesma sessão, regra oposta. <strong>Conhece a regra e a
+        viola</strong> — inconsistência entre respostas, um modo de falha que a
+        taxonomia inicial não previa.
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ ARTEFATOS ═══ -->
+  <section id="artefatos">
+    <span class="etiqueta">Abre no navegador, sem instalar nada</span>
+    <h2>As peças, funcionando</h2>
+    <div class="artefatos">
+      <a class="cartao" href="anotar.html">
+        <span class="tipo">Interface</span>
+        <h3>Anotação de traces</h3>
+        <p>Onde o especialista rotula. Arraste um <code>.jsonl</code>, use as
+           teclas 1–9, exporte o padrão-ouro. Nada sai do navegador.</p>
+        <span class="seta">abrir →</span>
+      </a>
+      <a class="cartao" href="relatorio-exemplo.html">
+        <span class="tipo">Saída</span>
+        <h3>Relatório de uma rodada</h3>
+        <p>Painel gerado pelo pipeline. A precisão dos avaliadores em destaque,
+           antes de qualquer taxa de falha.</p>
+        <span class="seta">abrir →</span>
+      </a>
+      <a class="cartao" href="https://github.com/akamitatrush/papinha-evals">
+        <span class="tipo">Código</span>
+        <h3>Repositório</h3>
+        <p>10 avaliadores determinísticos, 4 juízes LLM, harness de validação
+           com TPR/TNR e o pipeline de um comando.</p>
+        <span class="seta">github →</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ RESSALVAS ═══ -->
+  <section id="ressalvas">
+    <span class="etiqueta">O que este projeto ainda não provou</span>
+    <h2>As ressalvas fazem parte do resultado</h2>
+
+    <div class="ressalva">
+      <b>O auditor automático não está validado</b>
+      <p>O pipeline usa um LLM para decidir se cada achado procede. Ele é, ele
+         próprio, um juiz não medido — e nos testes classificou o mesmo achado de
+         formas diferentes em execuções distintas. Automatizar o julgamento não
+         elimina a validação humana: move ela de <em>toda rodada</em> para
+         <em>uma vez</em>.</p>
+    </div>
+
+    <div class="ressalva">
+      <b>33 traces não são 100</b>
+      <p>A meta de análise de erros é ~100 traces, onde novos casos param de
+         revelar tipos novos de falha. Três modos da taxonomia — restrição
+         declarada, contexto multiturno e bajulação sob pressão — não têm
+         ocorrência ainda, então seus avaliadores <em>não têm dados para ser
+         validados</em>.</p>
+    </div>
+
+    <div class="ressalva">
+      <b>Prevalência é estimativa, gravidade não</b>
+      <p>O eixo de gravidade vem de diretriz publicada. O de prevalência vem de
+         uma amostra pequena. Priorização feita sobre os dois deve tratar o
+         segundo como provisório.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      Exercício da formação <strong>Artificial Intelligence Product Leaders</strong> ·
+      Tera · Turma 6 — aula <em>Guardrails, testes e evals</em>, com Lucas Rocha.
+      Método apoiado nas <a href="https://github.com/hamelsmu/evals-skills">eval
+      skills de Hamel Husain</a>.
+    </p>
+    <p style="margin-top:.75rem">
+      Feito a quatro mãos por
+      <a href="https://github.com/akamitatrush">Sérgio Hasher</a> e
+      <a href="https://claude.com/claude-code">Claude</a> ·
+      <a href="https://github.com/akamitatrush/papinha-evals">código e histórico no GitHub</a>
+    </p>
+    <p class="aviso-saude">
+      Material didático. As regras de segurança seguem o Guia Alimentar para
+      Crianças Brasileiras Menores de 2 Anos (Ministério da Saúde, 2021), o
+      Manual de Alimentação da SBP e a diretriz de alimentação complementar da
+      OMS (2023) — mas <strong>não substituem orientação de pediatra ou
+      nutricionista</strong>.
+    </p>
+  </footer>
+
+</div>
+
+<script>
+document.getElementById("tema").onclick = () => {
+  const a = document.documentElement.getAttribute("data-tema");
+  const esc = a === "escuro" || (!a && matchMedia("(prefers-color-scheme:dark)").matches);
+  document.documentElement.setAttribute("data-tema", esc ? "claro" : "escuro");
+};
+</script>
+</body>
+</html>
