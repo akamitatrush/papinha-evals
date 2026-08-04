@@ -697,6 +697,124 @@ kbd {
 @media (min-width: 1040px) {
   .topo-conteudo, .acoes-conteudo { max-width: 84rem; }
 }
+
+/* ═══ MARCA E AJUDA ══════════════════════════════════════════════════════ */
+.marca-app {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-family: var(--mono); font-size: .68rem; font-weight: 500;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--tinta-fina);
+  white-space: nowrap;
+}
+.marca-app i {
+  font-style: normal; width: 1.35rem; height: 1.35rem;
+  display: grid; place-items: center;
+  border: 1px solid var(--acento); border-radius: 3px;
+  color: var(--acento); background: rgba(47,227,196,.1);
+  font-weight: 700; font-size: .7rem;
+}
+.btn-ajuda {
+  font-family: var(--mono); font-size: .68rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--tinta-meia);
+  background: transparent; border: 1px solid var(--regua-forte);
+  border-radius: 3px; padding: .25rem .6rem; cursor: pointer;
+  transition: color .2s, border-color .2s;
+}
+.btn-ajuda:hover { color: var(--acento); border-color: var(--acento); }
+
+.ajuda {
+  position: sticky; top: 0; z-index: 25;
+  background: var(--superficie);
+  border-bottom: 1px solid var(--regua-forte);
+  animation: descer .3s cubic-bezier(.2,.7,.3,1) both;
+}
+@keyframes descer { from { opacity: 0; transform: translateY(-10px) } }
+.ajuda-conteudo { max-width: 84rem; margin: 0 auto; padding: 1.25rem 1.5rem 1.5rem; }
+.ajuda-cabeca { display: flex; align-items: center; margin-bottom: .9rem; }
+.btn-fechar {
+  margin-left: auto; font-family: var(--mono); font-size: .68rem;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-fina);
+  background: transparent; border: none; cursor: pointer; padding: .2rem .4rem;
+}
+.btn-fechar:hover { color: var(--acento); }
+.ajuda-lead { font-size: .9375rem; color: var(--tinta-meia); margin-bottom: 1rem; max-width: 52rem; }
+.ajuda-lead b { color: var(--tinta); font-weight: 600; }
+
+.ajuda-grade {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1px; background: var(--regua); border: 1px solid var(--regua);
+  border-radius: 5px; overflow: hidden;
+}
+.ajuda-valor { background: var(--papel); padding: .85rem 1rem; }
+.ajuda-valor > b {
+  display: inline-block; font-family: var(--mono); font-size: .72rem;
+  letter-spacing: .06em; padding: .12rem .5rem; border-radius: 3px;
+  margin-bottom: .4rem; color: #fff;
+}
+.ajuda-valor.v-passa  > b { background: var(--passa); }
+.ajuda-valor.v-falha  > b { background: var(--falha); }
+.ajuda-valor.v-na     > b { background: var(--na); }
+.ajuda-valor.v-duvida > b { background: var(--revisar); }
+.ajuda-valor span { display: block; font-size: .8125rem; line-height: 1.55; color: var(--tinta-meia); }
+.ajuda-valor span b { color: var(--tinta); font-weight: 600; }
+
+.ajuda-armadilha {
+  margin-top: 1rem; padding: .85rem 1rem;
+  border-left: 2px solid var(--revisar); background: var(--papel);
+  border-radius: 0 4px 4px 0; font-size: .875rem; line-height: 1.6;
+  color: var(--tinta-meia); max-width: 52rem;
+}
+.ajuda-armadilha b:first-child {
+  display: block; color: var(--revisar); font-weight: 600; margin-bottom: .25rem;
+}
+.ajuda-armadilha i { color: var(--tinta); }
+.ajuda-rodape { margin-top: .9rem; font-size: .8125rem; color: var(--tinta-fina); line-height: 1.7; }
+.ajuda-rodape kbd {
+  font-family: var(--mono); font-size: .72em; border: 1px solid var(--regua-forte);
+  border-radius: 3px; padding: .05em .3em; color: var(--tinta-meia);
+}
+
+/* ═══ ESTADO FINAL ═══════════════════════════════════════════════════════ */
+.concluido {
+  border: 1px solid var(--acento);
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(47,227,196,.08), transparent 70%), var(--superficie);
+  padding: 1.4rem 1.35rem 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 24px 60px -34px rgba(47,227,196,.6);
+  animation: descer .4s cubic-bezier(.2,.7,.3,1) both;
+}
+.concluido-selo {
+  width: 2.2rem; height: 2.2rem; border-radius: 50%;
+  display: grid; place-items: center; margin-bottom: .8rem;
+  background: var(--acento); color: #04140F; font-weight: 700; font-size: 1.05rem;
+}
+.concluido h2 {
+  font-size: 1.15rem; font-weight: 600; letter-spacing: -.02em; margin-bottom: .45rem;
+}
+.concluido p { font-size: .875rem; line-height: 1.6; color: var(--tinta-meia); }
+.concluido p b { color: var(--acento); font-family: var(--mono); }
+.btn-exportar-grande {
+  display: block; width: 100%; margin: 1.1rem 0 1rem;
+  font-family: var(--mono); font-size: .78rem; font-weight: 500;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: .75rem 1rem; border-radius: 4px; cursor: pointer;
+  background: var(--acento); color: #04140F; border: 1px solid var(--acento);
+  transition: transform .2s, box-shadow .2s;
+}
+.btn-exportar-grande:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px -12px rgba(47,227,196,.8);
+}
+.concluido-passos {
+  margin: 0; padding-left: 1.1rem;
+  font-size: .8125rem; line-height: 1.7; color: var(--tinta-fina);
+}
+.concluido-passos code {
+  font-family: var(--mono); font-size: .92em; color: var(--tinta-meia);
+  background: var(--papel); border: 1px solid var(--regua);
+  border-radius: 3px; padding: .05em .3em;
+  overflow-wrap: anywhere;
+}
 </style>
 </head>
 <body>
@@ -735,8 +853,10 @@ kbd {
 <header class="topo escondido" id="topo">
   <div class="topo-conteudo">
     <div class="linha-topo">
+      <span class="marca-app"><i>P</i> Papinha Evals · anotação</span>
       <span class="especime" id="especime"></span>
       <span class="meta-trace" id="meta"></span>
+      <button class="btn-ajuda" id="btn-ajuda">? como rotular</button>
       <span class="contagem" id="contagem"></span>
     </div>
     <div class="progresso"><i id="barra" style="width:0"></i></div>
@@ -746,6 +866,55 @@ kbd {
 </header>
 
 <!-- ═══ CORPO ═══ -->
+<!-- Ajuda sempre ao alcance: quem rotula pela primeira vez não tem por que
+     ter decorado as nove definições nem os quatro valores. -->
+<div class="ajuda escondido" id="ajuda">
+  <div class="ajuda-conteudo">
+    <div class="ajuda-cabeca">
+      <span class="etiqueta">Como rotular</span>
+      <button class="btn-fechar" id="fecha-ajuda">fechar</button>
+    </div>
+
+    <p class="ajuda-lead">
+      Você <b>não</b> avalia a pergunta — avalia <b>a resposta que o bot deu</b>.
+      Para cada trace são nove perguntas de sim ou não.
+    </p>
+
+    <div class="ajuda-grade">
+      <div class="ajuda-valor v-passa">
+        <b>passa</b>
+        <span>O bot <b>não</b> cometeu esse erro. O assunto apareceu e ele acertou.
+              É a resposta mais comum — o bot é bom.</span>
+      </div>
+      <div class="ajuda-valor v-falha">
+        <b>falha</b>
+        <span>O bot cometeu. Você consegue apontar o trecho errado com o dedo.</span>
+      </div>
+      <div class="ajuda-valor v-na">
+        <b>na</b>
+        <span>A pergunta não faz sentido aqui — o assunto nem apareceu no trace.</span>
+      </div>
+      <div class="ajuda-valor v-duvida">
+        <b>dúvida</b>
+        <span>Não deu para decidir. Fica fora da métrica sem travar a rotulagem.</span>
+      </div>
+    </div>
+
+    <div class="ajuda-armadilha">
+      <b>A armadilha</b>
+      O bot dizendo <i>“não use mel, é risco de botulismo”</i> é <b>passa</b>, não
+      falha. Marcar falha ali porque a palavra apareceu foi exatamente o erro que
+      fez a primeira medição deste projeto dar 100%.
+    </div>
+
+    <p class="ajuda-rodape">
+      O selo <span class="selo-jogo">encostou</span> marca os modos cujos termos
+      aparecem no texto — é onde olhar primeiro, nunca um veredito. Clique nele
+      para ir até o trecho. As teclas <kbd>1</kbd>–<kbd>9</kbd> ciclam os valores.
+    </p>
+  </div>
+</div>
+
 <main class="escondido" id="app">
   <div id="troca">
     <div class="coluna-conversa">
@@ -764,6 +933,22 @@ kbd {
     </div>
 
     <div class="coluna-juizo">
+      <!-- Estado final: sem ele, quem rotula não sabe que terminou nem o que
+           fazer com o resultado. -->
+      <div class="concluido escondido" id="concluido">
+        <div class="concluido-selo">✓</div>
+        <h2>Rotulagem completa</h2>
+        <p>Os <b id="conc-n">35</b> traces estão rotulados. Este é o padrão-ouro
+           do projeto — a partir daqui os avaliadores deixam de ser opinião e
+           passam a ter TPR e TNR medidos.</p>
+        <button class="btn-exportar-grande" id="exportar-final">Exportar rotulos.csv</button>
+        <ol class="concluido-passos">
+          <li>Salve o arquivo em <code>analise_erros/rotulos_reais.csv</code></li>
+          <li>Rode <code>python rodar_evals.py dados/traces.jsonl --saida analise_erros/predicoes_reais.jsonl</code></li>
+          <li>Rode <code>python validar_todos.py</code></li>
+        </ol>
+      </div>
+
       <div class="juizo-topo">
         <span class="etiqueta">O bot cometeu algum destes?</span>
         <span class="restam" id="restam"></span>
@@ -1035,6 +1220,10 @@ function render() {
     grade.appendChild(linha);
   });
 
+  const tudoPronto = completos() === traces.length;
+  $("concluido").classList.toggle("escondido", !tudoPronto);
+  $("conc-n").textContent = traces.length;
+
   const faltam = MODOS.filter(([c]) => !r[c]).length;
   const el = $("restam");
   el.textContent = faltam ? `faltam ${faltam}` : "completo";
@@ -1106,6 +1295,9 @@ function irPendente() {
 $("anterior").onclick = () => ir(-1);
 $("proximo").onclick  = () => ir(1);
 $("pendente").onclick = irPendente;
+$("btn-ajuda").onclick = () => $("ajuda").classList.toggle("escondido");
+$("exportar-final").onclick = () => $("exportar").click();
+$("fecha-ajuda").onclick = () => $("ajuda").classList.add("escondido");
 $("nota").addEventListener("blur", salvarNota);
 $("limpar").onclick = () => {
   if (confirm("Apagar o rascunho salvo neste navegador? Os rótulos da sessão atual continuam na tela.")) {
