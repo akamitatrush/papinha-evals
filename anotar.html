@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Anotação de traces — Papinha Fácil</title>
 <link rel="icon" href="docs/icone.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Sem rede a pilha de fallback assume; nada quebra. -->
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════
    PRONTUÁRIO QUENTE
@@ -13,81 +17,48 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --papel:      #F7F4EE;
-  --superficie: #FFFDF9;
-  --elevado:    #FFFFFF;
-  --tinta:      #1F1B16;
-  --tinta-meia: #6B6259;
-  --tinta-fina: #9C9287;
-  --regua:      #E4DDD2;
-  --regua-forte:#D2C8B8;
-  --acento:     #1F4E5F;
-  --passa:      #2E6F4E;
-  --falha:      #A8321F;
-  --na:         #8A8178;
-  --revisar:    #B26B12;
-  --marca-bg:   #FBEBBE;
-  --marca-tinta:#6B4A05;
-  --marca-linha:#D9A72C;
-  --sombra:     0 1px 2px rgba(31,27,22,.05), 0 8px 24px -12px rgba(31,27,22,.18);
-  --sombra-alta:0 2px 4px rgba(31,27,22,.06), 0 16px 40px -16px rgba(31,27,22,.28);
+  /* Painel de instrumentação — a mesma identidade do site. O anotador é a
+     bancada onde o trace é examinado, não uma folha de papel. */
+  --papel:      #07080A;
+  --superficie: #0C0E12;
+  --elevado:    #11141A;
+  --tinta:      #EDF1F6;
+  --tinta-meia: #9AA5B4;
+  --tinta-fina: #5D6675;
+  --regua:      #1B1F27;
+  --regua-forte:#2B323E;
+  --acento:     #2FE3C4;
+  --passa:      #1F9480;
+  --falha:      #A83F2E;
+  --na:         #3A414D;
+  --revisar:    #C38618;
+  --marca-bg:   rgba(255,176,32,.16);
+  --marca-tinta:#FFC24D;
+  --marca-linha:#C38618;
+  --sombra:     0 1px 2px rgba(0,0,0,.5), 0 10px 30px -14px rgba(0,0,0,.8);
+  --sombra-alta:0 2px 6px rgba(0,0,0,.6), 0 22px 50px -18px rgba(0,0,0,.9);
 
+  /* A resposta do bot é texto longo de leitura: serifada. O resto é
+     instrumento: geométrica e monoespaçada. */
   --serifada: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua",
               "Hoefler Text", Georgia, serif;
-  --mono: "SF Mono", "JetBrains Mono", "IBM Plex Mono", "Cascadia Mono",
-          ui-monospace, "Menlo", monospace;
-  --sans: "Optima", "Avenir Next", "Segoe UI", Helvetica, sans-serif;
+  --mono: "JetBrains Mono", "SF Mono", "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --sans: "Sora", "Segoe UI", system-ui, Helvetica, sans-serif;
 
-  --grao: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
-}
-
-:root[data-tema="escuro"], html:not([data-tema="claro"]) {
-  color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  html:not([data-tema="claro"]) {
-    --papel:      #14120E;
-    --superficie: #1B1915;
-    --elevado:    #22201A;
-    --tinta:      #EDE7DC;
-    --tinta-meia: #A79E90;
-    --tinta-fina: #736B60;
-    --regua:      #2E2A23;
-    --regua-forte:#413B31;
-    --acento:     #7FBECE;
-    --passa:      #63C48C;
-    --falha:      #EE7259;
-    --na:         #8A8178;
-    --revisar:    #D99A3C;
-    --marca-bg:   #4E3A08;
-    --marca-tinta:#FBE6A8;
-    --marca-linha:#8A6A16;
-    --sombra:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
-    --sombra-alta:0 2px 4px rgba(0,0,0,.5), 0 16px 40px -16px rgba(0,0,0,.7);
-    color-scheme: dark;
-  }
-}
-html[data-tema="escuro"] {
-  --papel:      #14120E;
-  --superficie: #1B1915;
-  --elevado:    #22201A;
-  --tinta:      #EDE7DC;
-  --tinta-meia: #A79E90;
-  --tinta-fina: #736B60;
-  --regua:      #2E2A23;
-  --regua-forte:#413B31;
-  --acento:     #7FBECE;
-  --passa:      #63C48C;
-  --falha:      #EE7259;
-  --na:         #8A8178;
-  --revisar:    #D99A3C;
-  --marca-bg:   #4E3A08;
-  --marca-tinta:#FBE6A8;
-  --marca-linha:#8A6A16;
-  --sombra:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
-  --sombra-alta:0 2px 4px rgba(0,0,0,.5), 0 16px 40px -16px rgba(0,0,0,.7);
+  --grao: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
   color-scheme: dark;
+}
+/* Tema claro continua disponível pelo botão, para quem for imprimir ou
+   preferir papel. */
+:root[data-tema="claro"] {
+  --papel:#F7F4EE; --superficie:#FFFDF9; --elevado:#FFFFFF;
+  --tinta:#1F1B16; --tinta-meia:#6B6259; --tinta-fina:#9C9287;
+  --regua:#E4DDD2; --regua-forte:#D2C8B8; --acento:#1F4E5F;
+  --passa:#2E6F4E; --falha:#A8321F; --na:#8A8178; --revisar:#B26B12;
+  --marca-bg:#FBEBBE; --marca-tinta:#6B4A05; --marca-linha:#D9A72C;
+  --sombra:0 1px 2px rgba(31,27,22,.05), 0 8px 24px -12px rgba(31,27,22,.18);
+  --sombra-alta:0 2px 4px rgba(31,27,22,.06), 0 16px 40px -16px rgba(31,27,22,.28);
+  color-scheme: light;
 }
 
 * { box-sizing: border-box; margin: 0; }
@@ -116,87 +87,102 @@ body {
 /* ═══ ABERTURA ═══════════════════════════════════════════════════════════ */
 
 .abertura {
-  max-width: 46rem;
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  max-width: 44rem;
   margin: 0 auto;
-  padding: 5rem 1.5rem 3rem;
+  padding: 3rem 1.5rem;
   animation: subir .6s cubic-bezier(.2,.7,.3,1) both;
 }
 @keyframes subir { from { opacity: 0; transform: translateY(14px) } }
 
+.abertura .selo-topo {
+  display: inline-flex; align-items: center; gap: .55rem;
+  margin-bottom: 1.1rem;
+}
+.abertura .selo-topo::before {
+  content: ""; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--acento); box-shadow: 0 0 12px var(--acento);
+}
 .abertura h1 {
-  font-family: var(--serifada);
-  font-size: clamp(2rem, 5vw, 2.9rem);
-  font-weight: 400;
-  line-height: 1.1;
-  letter-spacing: -.015em;
-  margin-bottom: .6rem;
+  font-family: var(--sans);
+  font-size: clamp(2.1rem, 5vw, 3.1rem);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -.04em;
+  margin-bottom: .8rem;
 }
 .abertura h1 em {
-  font-style: italic;
+  font-style: normal;
   color: var(--acento);
+  text-shadow: 0 0 40px rgba(47,227,196,.4);
 }
 .abertura .subtitulo {
-  font-family: var(--serifada);
   font-size: 1.0625rem;
   line-height: 1.6;
   color: var(--tinta-meia);
-  max-width: 34rem;
-  margin-bottom: 2.5rem;
+  max-width: 36rem;
+  margin-bottom: 2.25rem;
 }
 
+/* Zona de soltar: tem de parecer um alvo, não um retângulo apagado. */
 .zona {
   position: relative;
-  border: 1px solid var(--regua-forte);
-  border-radius: 2px;
+  border: 1px dashed var(--regua-forte);
+  border-radius: 8px;
   background: var(--superficie);
-  padding: 3.25rem 2rem;
+  padding: 2.75rem 2rem;
   text-align: center;
   cursor: pointer;
-  transition: border-color .2s, box-shadow .25s, transform .25s;
-  box-shadow: var(--sombra);
+  overflow: hidden;
+  transition: border-color .2s, background .2s, transform .25s, box-shadow .25s;
 }
-.zona::before {
+.zona::after {                       /* brilho de sinal atrás do alvo */
   content: "";
-  position: absolute;
-  inset: 6px;
-  border: 1px dashed var(--regua);
-  border-radius: 1px;
-  pointer-events: none;
-  transition: border-color .2s;
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(22rem 12rem at 50% 120%, rgba(47,227,196,.14), transparent 70%);
+  opacity: .7; transition: opacity .25s;
 }
 .zona:hover, .zona.ativo {
   border-color: var(--acento);
+  background: var(--elevado);
   transform: translateY(-2px);
-  box-shadow: var(--sombra-alta);
+  box-shadow: 0 24px 60px -30px rgba(47,227,196,.55);
 }
-.zona:hover::before, .zona.ativo::before { border-color: var(--acento); }
+.zona:hover::after, .zona.ativo::after { opacity: 1; }
+.zona .icone {
+  width: 2.6rem; height: 2.6rem; margin: 0 auto .9rem;
+  border: 1px solid var(--acento); border-radius: 6px;
+  display: grid; place-items: center;
+  color: var(--acento); font-size: 1.15rem;
+  background: rgba(47,227,196,.1);
+  position: relative; z-index: 1;
+}
 .zona .principal {
-  font-family: var(--serifada);
-  font-size: 1.25rem;
-  margin-bottom: .5rem;
+  font-size: 1.15rem; font-weight: 500; letter-spacing: -.015em;
+  margin-bottom: .45rem; position: relative; z-index: 1;
 }
 .zona .secundario {
-  font-size: .875rem;
-  color: var(--tinta-meia);
-  max-width: 28rem;
-  margin: 0 auto;
+  font-size: .875rem; color: var(--tinta-meia);
+  max-width: 30rem; margin: 0 auto; line-height: 1.6;
+  position: relative; z-index: 1;
 }
 .zona code {
-  font-family: var(--mono);
-  font-size: .9em;
-  background: var(--papel);
-  padding: .1em .35em;
-  border-radius: 2px;
-  border: 1px solid var(--regua);
+  font-family: var(--mono); font-size: .85em;
+  color: var(--acento);
+  background: rgba(47,227,196,.1);
+  border: 1px solid rgba(47,227,196,.22);
+  padding: .12em .4em; border-radius: 3px;
 }
 
 .nota-privacidade {
-  margin-top: 1.75rem;
+  margin-top: 1.6rem;
   padding-left: 1rem;
-  border-left: 2px solid var(--regua-forte);
+  border-left: 1px solid var(--regua-forte);
   font-size: .8125rem;
-  line-height: 1.6;
-  color: var(--tinta-meia);
+  line-height: 1.65;
+  color: var(--tinta-fina);
 }
 
 /* ═══ CABEÇALHO FIXO ═════════════════════════════════════════════════════ */
@@ -311,7 +297,6 @@ main {
    e as perguntas ficam paradas à direita — os dois na tela ao mesmo tempo. */
 @media (min-width: 1040px) {
   main { max-width: 84rem; }
-  .topo-conteudo { max-width: 84rem; }   /* senão o cabeçalho fica mais estreito que o conteúdo */
   #troca {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 25rem;
@@ -331,12 +316,34 @@ main {
   .coluna-juizo .anotacao { margin-top: 1.25rem; }
   /* Em duas colunas o espaço é estreito: botões embaixo da pergunta. */
   .modo {
-    grid-template-columns: 2.75rem 1fr;
-    row-gap: .5rem;
-    padding: .7rem 0;
+    grid-template-columns: 2.6rem 1fr;
+    row-gap: .55rem;
   }
   .modo .segmentado { grid-column: 2; justify-self: start; }
+  .modo.respondido { padding: .5rem 1rem; }
 }
+
+/* ── cartões de modo ──────────────────────────────────────────────────────
+   Nove blocos de mesmo peso empilhados viram parede. Aqui o modo já
+   respondido encolhe para uma linha e a pergunta some — a lista diminui
+   conforme o trabalho anda, em vez de gritar tudo junto o tempo todo. */
+.modo {
+  background: var(--superficie);
+  border: 1px solid var(--regua);
+  border-radius: 5px;
+  padding: .85rem 1rem;
+  margin-bottom: .5rem;
+  transition: border-color .2s, background .2s, opacity .2s;
+}
+.modo.em-jogo { border-left: 2px solid var(--revisar); }
+.modo.respondido {
+  background: transparent;
+  border-color: var(--regua);
+  opacity: .62;
+}
+.modo.respondido:hover { opacity: 1; }
+.modo.respondido .modo-pergunta { display: none; }
+.modo.respondido .selo-jogo   { display: none; }
 
 /* Cabeçalho da coluna de juízo: quantas perguntas ainda faltam neste trace. */
 .juizo-topo {
@@ -458,13 +465,13 @@ mark {
 .modo-pergunta b { color: var(--tinta); font-weight: 600; }
 /* Marca os modos em que o texto deste trace encostou — onde olhar primeiro. */
 .modo.em-jogo { background: var(--elevado); }
-.modo.em-jogo .modo-codigo { color: var(--falha); }
+.modo.em-jogo .modo-codigo { color: var(--revisar); }
 .selo-jogo {
   font-family: var(--mono);
   font-size: .5625rem;
   letter-spacing: .1em;
   text-transform: uppercase;
-  color: var(--falha);
+  color: var(--revisar);
   border: 1px solid currentColor;
   border-radius: 2px;
   padding: .05rem .3rem;
@@ -681,6 +688,15 @@ kbd {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* ── larguras do cabeçalho e da barra de ações ────────────────────────────
+   Precisa vir DEPOIS de `.topo-conteudo` e `.acoes-conteudo`: mesma
+   especificidade, ganha quem é declarado por último. Dentro do bloco de duas
+   colunas, lá em cima, esta regra perdia — e o botão Exportar era cortado
+   pelo overflow:hidden da barra. */
+@media (min-width: 1040px) {
+  .topo-conteudo, .acoes-conteudo { max-width: 84rem; }
+}
 </style>
 </head>
 <body>
@@ -689,17 +705,21 @@ kbd {
 
 <!-- ═══ ABERTURA ═══ -->
 <section class="abertura" id="abertura">
+  <span class="etiqueta selo-topo">Papinha Evals · padrão-ouro</span>
   <h1>Anotação de <em>traces</em></h1>
   <p class="subtitulo">
-    Rotule cada resposta do Papinha Fácil por modo de falha. Isto é o padrão-ouro —
-    o arquivo contra o qual todo avaliador automatizado é medido.
+    Você lê cada resposta do Papinha Fácil e responde nove perguntas de sim ou não.
+    O resultado é o arquivo contra o qual todo avaliador automatizado é medido —
+    sem ele, nenhum número deste projeto tem lastro.
   </p>
 
   <div class="zona" id="zona">
-    <div class="principal">Arraste o <code>traces.jsonl</code></div>
+    <div class="icone">↓</div>
+    <div class="principal">Arraste os arquivos aqui</div>
     <div class="secundario">
-      ou clique para escolher. Solte junto um <code>rotulos.csv</code> existente
-      para retomar de onde parou.
+      <code>dados/traces.jsonl</code> para carregar os traces, e junto o
+      <code>analise_erros/rotulos_reais.csv</code> para começar já com os
+      <b>na</b> resolvidos. Ou clique para escolher.
     </div>
     <input type="file" id="arquivo" multiple accept=".jsonl,.csv,.json" class="escondido">
   </div>
@@ -984,7 +1004,8 @@ function render() {
       ? t.idade_meses == null                       // só cabe quando falta idade
       : (termos || []).some(x => corpo.includes(normalizar(x)));
     const linha = document.createElement("div");
-    linha.className = "modo" + (emJogo ? " em-jogo" : "");
+    linha.className = "modo" + (emJogo ? " em-jogo" : "")
+                        + (r[codigo] ? " respondido" : "");
     linha.style.animationDelay = `${i * 22}ms`;
     linha.innerHTML =
       `<span class="modo-codigo">${codigo}</span>` +
