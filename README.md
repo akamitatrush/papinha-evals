@@ -80,6 +80,7 @@ precisa lê-lo inteiro. Escolha a porta:
 | [🧪 Testes](#-testes) | [🛣️ Roadmap](#-roadmap) | [📚 Referências](#-referências) |
 | [🖥️ As interfaces](#-as-interfaces) | [🤖 Pipeline automático](#-pipeline-automático) | [🤝 Autoria](#-autoria) |
 | [🎬 Vídeo do sistema](#4-vídeo--o-sistema-rodando) | [🔌 Plugin de evals](#-plugin-de-evals) | [⚠️ Ressalvas](#-ressalvas) |
+| [📥 Importar CSV](#-importar-um-csv-de-conversas) | | |
 
 
 ---
@@ -1245,6 +1246,42 @@ Schema do trace:
 > `origem` é `real` ou `sintetico`. **Nunca misture os dois ao calcular taxa de
 > falha** — uma amostra fabricada para exercitar detectores tem, por construção,
 > uma distribuição de falhas que não existe em produção.
+
+---
+
+## 📥 Importar um CSV de conversas
+
+Quando os traces vêm prontos num CSV — o dataset da turma, um export de
+planilha — em vez de coletados do Telegram:
+
+```bash
+# 1. olhe o arquivo antes de converter: colunas, palpite de mapeamento, 1ª linha
+./.venv/bin/python coleta/importar_csv.py conversas.csv --inspecionar
+
+# 2. converta
+./.venv/bin/python coleta/importar_csv.py conversas.csv --saida dados/traces_turma.jsonl
+
+# 3. se o palpite errar, diga as colunas na mão
+./.venv/bin/python coleta/importar_csv.py conversas.csv \
+    --col-pergunta "Pergunta do Usuário" --col-resposta "Resposta do Chatbot"
+```
+
+O script adivinha as colunas por nome, ignorando acento, caixa e separador —
+`Idade do bebê` casa com `idade`, e `1 ano` vira `12`. Detecta o separador
+(`,` `;` tab `|`) e a codificação sozinho.
+
+**Se o CSV trouxer uma coluna de análise** (`ERRO: ...`, `Observação`,
+`Diagnóstico`), ela vai para o campo `nota` do trace e aparece na caixa de
+codificação aberta do `anotar.html` — a análise humana que já existe vira ponto
+de partida em vez de ser descartada.
+
+O que ele **não** faz é inventar dado. Sem coluna de idade, o trace sai com
+`idade_meses: null`, e o avaliador trata como "idade não informada" — que é o
+comportamento certo. Preencher com chute contaminaria a avaliação.
+
+> Não solte um CSV de conversas no `anotar.html`: lá o `.csv` é lido como
+> arquivo de **rótulos**. Ele agora avisa em vez de falhar em silêncio, mas o
+> caminho é este script.
 
 ---
 

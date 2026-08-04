@@ -1139,6 +1139,14 @@ function importarCsv(texto) {
   const linhas = texto.split("\n").filter(l => l.trim() && !l.trim().startsWith("#"));
   if (!linhas.length) return;
   const colunas = linhas[0].split(",").map(c => c.trim());
+  // Um CSV de rótulos tem trace_id e colunas F01, F02… Um CSV de CONVERSAS
+  // (o dataset da turma, por exemplo) não tem — e antes era engolido em
+  // silêncio, sem carregar nada e sem avisar.
+  if (!colunas.some(c => /^F\d{2}$/.test(c))) {
+    aviso("Esse CSV não é de rótulos. Para converter um CSV de conversas: "
+        + "python coleta/importar_csv.py arquivo.csv");
+    return;
+  }
   for (const linha of linhas.slice(1)) {
     const partes = linha.split(",");
     const id = (partes[0] || "").trim();
