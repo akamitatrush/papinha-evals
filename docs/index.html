@@ -475,6 +475,25 @@ footer a:hover{color:var(--sinal);border-bottom-color:var(--sinal)}
     </div>
 
     <p class="veredito">Abaixo da meta de 90% — <b>e isso está no relatório</b>.</p>
+
+    <h2 style="margin-top:3rem">Código ou juiz? A medição decidiu</h2>
+    <p>O mesmo critério tem as duas naturezas de avaliador implementadas. Rodaram
+       sobre os mesmos 195 traces, contra o mesmo padrão-ouro.</p>
+    <div class="legenda-rodadas" style="margin-top:1.5rem">
+      <div><div class="q" style="color:var(--ink-3)">Código · grátis</div>
+        <p class="d">TPR 76% · TNR 79% · F1 62%<br>
+          <b style="color:var(--critico)">11 falhas reais passaram</b></p></div>
+      <div><div class="q">Juiz · US$ 0,91</div>
+        <p class="d">TPR 87% · TNR 73% · F1 64%<br>
+          <b style="color:var(--sinal)">6 falhas reais passaram</b></p></div>
+      <div><div class="q" style="color:var(--ink-3)">F1</div>
+        <p class="d">Empate técnico: 62,5% contra 63,5%. Se fosse o único critério,
+          a escolha viraria custo.</p></div>
+      <div><div class="q" style="color:var(--sinal)">A decisão</div>
+        <p class="d">O juiz fica. Não por métrica melhor — por <b>errar do lado
+          certo</b>. Alarme falso custa revisão; falha que passa pode ser mel
+          num bebê de 8 meses.</p></div>
+    </div>
     <p style="margin-top:1.5rem">Um número ruim medido vale mais que um número bom
        estimado. O que mudou não foi o bot: foi descobrir que o avaliador lia a idade
        de um campo que trace nenhum de produção tem.</p>

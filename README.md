@@ -826,8 +826,24 @@ experimento controlado.
 | [`J5`](avaliadores/juizes/J5_verificacao_idade.md) | Paráfrase, ironia, pergunta implícita | Custa dinheiro e latência; pode alucinar |
 
 **Quem fica, decide a medição contra os rótulos humanos — não o palpite de quem
-escreveu.** Os dois rodam sobre os mesmos traces e o `validar_todos.py` compara
-TPR, TNR e F1 lado a lado.
+escreveu.** Os dois rodaram sobre os mesmos 195 traces do dataset da turma,
+contra o mesmo padrão-ouro:
+
+| | VP | FP | VN | **FN** | TPR | TNR | F1 |
+|:---|--:|--:|--:|--:|--:|--:|--:|
+| `av_idade_assumida` (código) | 35 | 31 | 118 | **11** | 76,1% | **79,2%** | 62,5% |
+| `J5` (juiz, Haiku 4.5) | 40 | 40 | 109 | **6** | **87,0%** | 73,2% | **63,5%** |
+
+O F1 é empate técnico — 62,5% contra 63,5%. **A composição é que decide.** O juiz
+pega onze pontos a mais de falha real e paga com mais alarme falso.
+
+Neste domínio o **falso negativo** é o erro que dói: um alarme falso custa cinco
+minutos de revisão, uma falha que passa pode ser mel num bebê de 8 meses. O
+código deixa passar **11** falhas reais; o juiz, **6**.
+
+**O juiz fica** — não por ter métrica melhor, mas por errar do lado certo. Se o
+F1 fosse o critério isolado, a escolha viraria custo: o código é grátis, o juiz
+custou US$ 0,91 nos 195 traces. Nenhum dos dois bate a meta de 90%.
 
 Uma correção que saiu daí: o avaliador de código procurava a pergunta de idade
 em **qualquer lugar** da resposta. Um bot que entregava a receita inteira e
