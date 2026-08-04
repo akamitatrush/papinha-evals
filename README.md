@@ -8,7 +8,10 @@
 
 <br>
 
-**[→ akamitatrush.github.io/papinha-evals](https://akamitatrush.github.io/papinha-evals/)**
+**[→ Site do projeto](https://akamitatrush.github.io/papinha-evals/)** ·
+**[→ Guia narrado](docs/GUIA.md)** ·
+**[→ Anotar traces](https://akamitatrush.github.io/papinha-evals/anotar.html)** ·
+**[→ Relatório de exemplo](https://akamitatrush.github.io/papinha-evals/relatorio-exemplo.html)**
 
 ![CI](https://github.com/akamitatrush/papinha-evals/actions/workflows/testes.yml/badge.svg)
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)
@@ -53,7 +56,89 @@
 | [🧭 Código ou juiz?](#-código-ou-juiz) | [🗂️ Taxonomia](#-taxonomia-de-falhas) | [📐 Priorização](#-priorização) |
 | [🚀 Instalação](#-instalação) | [▶️ Uso](#-uso) | [📊 Validação](#-validação-e-métricas) |
 | [🧪 Testes](#-testes) | [🛣️ Roadmap](#-roadmap) | [📚 Referências](#-referências) |
-| [🤖 Pipeline automático](#-pipeline-automático) | [🤝 Autoria](#-autoria) | |
+| [🖥️ As interfaces](#️-as-interfaces) | [🤖 Pipeline automático](#-pipeline-automático) | [🤝 Autoria](#-autoria) |
+
+
+---
+
+## 🖥️ As interfaces
+
+Duas telas, ambas **arquivo único, sem rede, sem instalação**. Abrem com duplo
+clique e funcionam offline.
+
+### 1. Anotação de traces — onde o humano rotula
+
+É aqui que nasce o padrão-ouro: o arquivo contra o qual todo avaliador
+automatizado é medido. Sem esta etapa, não existe TPR/TNR — e sem TPR/TNR, um
+juiz é só um LLM opinando sobre outro.
+
+<img src="docs/img/anotar-leitura-claro.png" alt="Tela de leitura do trace: cabeçalho com identificador, idade e selo de restrição APLV; a pergunta do cuidador em itálico e a resposta do bot em serifada, com os termos de risco sublinhados" width="100%">
+
+**O que está acontecendo na tela acima:**
+
+| Elemento | Por quê |
+|:---|:---|
+| `t118 · 8 meses · real · q030` | Etiqueta de espécime em mono, numerais tabulares — identificação, não decoração |
+| Selo <kbd>APLV</kbd> em vermelho | Restrição declarada pelo usuário. Fica no topo porque é o que mais gera falha silenciosa |
+| Resposta em **serifada, 64 caracteres de largura** | Este texto é o objeto de estudo. Rotular 100 traces é leitura longa; a tipografia é de leitura, não de painel |
+| <u>leite de vaca</u>, <u>caldo de legumes</u>, <u>sal</u> sublinhados | Termos de risco, marcados como um revisor marcaria. **Destaque não é veredito** — o termo pode estar numa advertência correta |
+| Barra fina no topo | Progresso; abaixo dela, o minimapa em traços de altura variável |
+
+<img src="docs/img/anotar-rotulagem-claro.png" alt="Grade de rotulagem: nove modos de falha, cada um com três botões segmentados passa, falha e na; F03 e F05 marcados como falha em vermelho" width="100%">
+
+**A grade de rotulagem.** Nove modos, três estados cada. Teclas <kbd>1</kbd>–<kbd>9</kbd>
+ciclam `passa → falha → na` sem tocar o mouse; ao fechar os nove, a tela avança
+sozinha para o próximo pendente. O estado é legível **por forma além de cor** —
+preenchido é falha, contorno é passa — então funciona impresso e para quem não
+distingue vermelho de verde.
+
+Abaixo da grade fica a **codificação aberta**: uma frase por trace sobre a
+*primeira* coisa que deu errado. Observação, não explicação.
+
+<details>
+<summary><b>Ver em tema escuro</b></summary>
+
+<img src="docs/img/anotar-rotulagem-escuro.png" alt="A mesma grade de rotulagem em tema escuro" width="100%">
+
+</details>
+
+### 2. Relatório — o que sai do pipeline
+
+Gerado a cada rodada do `auto.py`, ao lado do markdown.
+
+<img src="docs/img/relatorio-claro.png" alt="Painel do relatório: cartões com traces avaliados, achados brutos, falhas confirmadas e precisão dos avaliadores; abaixo, o número-herói de 67% com barra de composição e o alerta de que a taxa bruta não descreve o bot" width="100%">
+
+**A primeira coisa que o relatório mostra não é a taxa de falha — é a precisão
+dos avaliadores.** De propósito. Se essa precisão for baixa, a contagem de
+achados mede sobretudo os bugs dos detectores, e o painel diz isso em voz alta
+antes que alguém copie o número para um slide.
+
+| Bloco | Forma escolhida | Trabalho que o dado faz |
+|:---|:---|:---|
+| Precisão | Número-herói | É manchete, não gráfico |
+| procede / FP / incerto | Barra de composição | Proporção de um todo |
+| Achados por avaliador | Barras empilhadas | Barra cheia é o que o detector apontou; a parte vermelha é o que sobreviveu à auditoria |
+| Resultado por trace | Grade de células | Identidade, escaneável de relance |
+| Taxonomia | Tabela com ícone **+ rótulo** | Cor nunca sozinha |
+
+Paleta validada com o script de checagem da skill de dataviz: passa nas cinco
+verificações, incluindo separação para daltonismo.
+
+<details>
+<summary><b>Ver em tema escuro</b></summary>
+
+<img src="docs/img/relatorio-escuro.png" alt="O mesmo painel de relatório em tema escuro" width="100%">
+
+</details>
+
+### 3. Site do projeto
+
+<a href="https://akamitatrush.github.io/papinha-evals/">
+<img src="docs/img/site.png" alt="Página do projeto: título O eval errou antes do bot, seguido das quatro medições 100%, 64%, 48% e 18% com a causa de cada correção" width="100%">
+</a>
+
+**[akamitatrush.github.io/papinha-evals](https://akamitatrush.github.io/papinha-evals/)** —
+conta a tese e abre as duas ferramentas ao vivo, não em captura de tela.
 
 ---
 
