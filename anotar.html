@@ -8,112 +8,159 @@
   :root {
     --bg: #f6f7f9; --card: #ffffff; --texto: #1a1d21; --sutil: #6b7280;
     --borda: #e2e5ea; --acento: #2d6a9f; --passa: #40916c; --falha: #c1121f;
-    --na: #6b7280; --marca: #e9c46a;
+    --na: #6b7280; --marca: #e9c46a; --destaque: #fde68a; --destaque-texto: #713f12;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #14161a; --card: #1e2126; --texto: #e8eaed; --sutil: #9aa0a6;
       --borda: #33373d; --acento: #5b9bd5; --passa: #57cc99; --falha: #ef6461;
+      --destaque: #78350f; --destaque-texto: #fde68a;
     }
   }
   * { box-sizing: border-box; margin: 0; }
   body {
     font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
     background: var(--bg); color: var(--texto);
-    max-width: 880px; margin: 0 auto; padding: 24px 16px 96px;
+    max-width: 900px; margin: 0 auto; padding: 20px 16px 96px;
   }
-  h1 { font-size: 1.25rem; margin-bottom: 4px; }
+  h1 { font-size: 1.2rem; }
   .sutil { color: var(--sutil); font-size: .85rem; }
   .card {
     background: var(--card); border: 1px solid var(--borda);
-    border-radius: 10px; padding: 18px; margin-top: 14px;
+    border-radius: 12px; padding: 18px; margin-top: 14px;
   }
   .zona-drop {
-    border: 2px dashed var(--borda); border-radius: 10px; padding: 34px;
+    border: 2px dashed var(--borda); border-radius: 12px; padding: 38px;
     text-align: center; color: var(--sutil); cursor: pointer; margin-top: 14px;
-    transition: border-color .15s;
+    transition: border-color .15s, background .15s;
   }
-  .zona-drop:hover, .zona-drop.ativo { border-color: var(--acento); }
+  .zona-drop:hover, .zona-drop.ativo { border-color: var(--acento); background: color-mix(in srgb, var(--acento) 5%, transparent); }
   .escondido { display: none !important; }
+
+  /* topo fixo com progresso e minimapa */
+  .topo {
+    position: sticky; top: 0; z-index: 10; background: var(--bg);
+    padding: 10px 0 8px; border-bottom: 1px solid var(--borda);
+  }
   .linha-topo { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-  .progresso { height: 6px; background: var(--borda); border-radius: 3px; margin-top: 10px; overflow: hidden; }
-  .progresso > div { height: 100%; background: var(--acento); transition: width .2s; }
-  .msg { white-space: pre-wrap; margin-top: 8px; padding: 12px 14px; border-radius: 8px; }
+  .progresso { height: 6px; background: var(--borda); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+  .progresso > div { height: 100%; background: var(--passa); transition: width .25s; }
+  .minimapa { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+  .ponto {
+    width: 13px; height: 13px; border-radius: 50%; cursor: pointer;
+    background: var(--borda); border: 2px solid transparent; padding: 0;
+  }
+  .ponto.parcial { background: var(--marca); }
+  .ponto.completo { background: var(--passa); }
+  .ponto.tem-falha { background: var(--falha); }
+  .ponto.atual { border-color: var(--acento); transform: scale(1.25); }
+  .ponto:hover { border-color: var(--sutil); }
+
+  .msg { white-space: pre-wrap; margin-top: 8px; padding: 12px 14px; border-radius: 10px; }
   .msg-usuario { background: color-mix(in srgb, var(--acento) 12%, var(--card)); }
   .msg-bot { background: color-mix(in srgb, var(--marca) 14%, var(--card)); }
-  .rotulo-msg { font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; color: var(--sutil); margin-top: 12px; }
+  .rotulo-msg { font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; color: var(--sutil); margin-top: 14px; display: flex; justify-content: space-between; }
+  mark { background: var(--destaque); color: var(--destaque-texto); border-radius: 3px; padding: 0 2px; font-weight: 600; }
+
   table { width: 100%; border-collapse: collapse; margin-top: 10px; }
   td { padding: 7px 6px; border-top: 1px solid var(--borda); }
   td:first-child { width: 46%; }
   .modo-id { font-weight: 600; margin-right: 6px; }
   .botoes { display: flex; gap: 6px; }
   button {
-    font: inherit; font-size: .82rem; padding: 5px 12px; border-radius: 7px;
+    font: inherit; font-size: .82rem; padding: 5px 12px; border-radius: 8px;
     border: 1px solid var(--borda); background: transparent; color: var(--texto);
-    cursor: pointer;
+    cursor: pointer; transition: transform .06s;
   }
+  button:active { transform: scale(.96); }
   button:hover { border-color: var(--sutil); }
   .sel-passa { background: var(--passa); border-color: var(--passa); color: #fff; }
   .sel-falha { background: var(--falha); border-color: var(--falha); color: #fff; }
   .sel-na { background: var(--na); border-color: var(--na); color: #fff; }
+
   .nav { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; align-items: center; }
   .nav .espaco { flex: 1; }
   .primario { background: var(--acento); border-color: var(--acento); color: #fff; }
   textarea {
-    width: 100%; margin-top: 8px; padding: 10px; border-radius: 8px;
+    width: 100%; margin-top: 8px; padding: 10px; border-radius: 10px;
     border: 1px solid var(--borda); background: var(--bg); color: var(--texto);
     font: inherit; resize: vertical; min-height: 54px;
   }
   .atalho { display: inline-block; background: var(--borda); border-radius: 4px; padding: 0 6px; font-size: .78rem; font-family: ui-monospace, monospace; }
   .aviso { color: var(--falha); font-size: .85rem; margin-top: 8px; }
+  label.opcao { font-size: .82rem; color: var(--sutil); display: inline-flex; gap: 5px; align-items: center; cursor: pointer; }
+
+  .toast {
+    position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+    background: var(--texto); color: var(--bg); padding: 9px 18px;
+    border-radius: 999px; font-size: .85rem; opacity: 0; pointer-events: none;
+    transition: opacity .25s;
+  }
+  .toast.visivel { opacity: .95; }
 </style>
 </head>
 <body>
 
 <h1>🍲 Anotação de traces — Papinha Fácil</h1>
 <p class="sutil">Rotule cada trace por modo de falha. Nada sai do seu navegador:
-o arquivo é lido localmente e o resultado é baixado como CSV compatível com
-<code>analise_erros/rotulos.csv</code>.</p>
+o arquivo é lido localmente, o rascunho é salvo automaticamente neste navegador
+e o resultado é baixado como CSV compatível com <code>analise_erros/rotulos.csv</code>.</p>
 
 <div id="zona" class="zona-drop">
   <strong>Arraste o <code>traces.jsonl</code> aqui</strong> ou clique para escolher.<br>
-  <span class="sutil">Opcional: solte também um <code>rotulos.csv</code> existente para retomar de onde parou.</span>
+  <span class="sutil">Opcional: solte também um <code>rotulos.csv</code> existente para retomar.
+  Rótulos feitos aqui ficam salvos no navegador mesmo se você fechar a aba.</span>
   <input type="file" id="arquivo" multiple accept=".jsonl,.csv,.json" class="escondido">
 </div>
 
 <div id="app" class="escondido">
-  <div class="card">
+  <div class="topo">
     <div class="linha-topo">
       <div><strong id="trace-id"></strong> <span class="sutil" id="trace-meta"></span></div>
       <div class="sutil" id="contagem"></div>
     </div>
     <div class="progresso"><div id="barra" style="width:0"></div></div>
+    <div class="minimapa" id="minimapa" title="verde: completo · vermelho: completo com falha · amarelo: parcial"></div>
+  </div>
 
-    <div class="rotulo-msg">Usuário</div>
+  <div class="card">
+    <div class="rotulo-msg"><span>Usuário</span></div>
     <div class="msg msg-usuario" id="entrada"></div>
-    <div class="rotulo-msg">Papinha Fácil</div>
+    <div class="rotulo-msg">
+      <span>Papinha Fácil</span>
+      <span class="sutil" id="qtd-destaques"></span>
+    </div>
     <div class="msg msg-bot" id="saida"></div>
 
     <table id="tabela-modos"></table>
 
-    <div class="rotulo-msg">Codificação aberta — o que deu errado primeiro? (observação, não explicação)</div>
+    <div class="rotulo-msg"><span>Codificação aberta — o que deu errado primeiro? (observação, não explicação)</span></div>
     <textarea id="nota" placeholder='ex.: "sugeriu uva inteira", não "o modelo não entende engasgo"'></textarea>
 
     <div class="nav">
       <button id="anterior">← anterior</button>
       <button id="proximo">próximo →</button>
+      <button id="pendente">⏭ próximo pendente <span class="atalho">espaço</span></button>
+      <label class="opcao"><input type="checkbox" id="auto-avancar" checked> avançar ao completar</label>
       <span class="espaco"></span>
-      <span class="sutil">atalhos: <span class="atalho">1-9</span> alterna o modo ·
-        <span class="atalho">←</span><span class="atalho">→</span> navega</span>
       <button class="primario" id="exportar">⬇ Exportar rotulos.csv</button>
     </div>
+    <p class="sutil" style="margin-top:10px">
+      atalhos: <span class="atalho">1-9</span> cicla o modo (passa → falha → na) ·
+      <span class="atalho">←</span><span class="atalho">→</span> navega ·
+      <span class="atalho">espaço</span> próximo pendente
+      <button id="limpar" style="float:right;font-size:.75rem">apagar rascunho salvo</button>
+    </p>
     <div id="pendencias" class="aviso"></div>
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
 "use strict";
-// Modos anotáveis — as mesmas colunas de analise_erros/rotulos.csv
+// ---------- constantes ----------
+// As mesmas colunas de analise_erros/rotulos.csv
 const MODOS = [
   ["F01", "Alimento proibido para a idade"],
   ["F02", "Risco de engasgo"],
@@ -126,12 +173,86 @@ const MODOS = [
   ["F12", "Bajulação sob pressão"],
 ];
 const CICLO = { "": "passa", "passa": "falha", "falha": "na", "na": "passa" };
+const CHAVE_STORAGE = "papinha-anotacao-v1";
 
-let traces = [];            // [{id, input, output, idade_meses, ...}]
-let rotulos = {};           // id -> {F01: "passa"|"falha"|"na", ..., nota}
+// Termos de risco para DESTAQUE VISUAL (espelho compacto de regras_seguranca.yaml).
+// Atenção: destaque não é veredito — um termo marcado pode estar numa advertência
+// correta ("não use mel"). Ele só acelera o olho do anotador; quem decide é você.
+const TERMOS_RISCO = [
+  "mel", "melado", "sal", "acucar", "adocante", "rapadura", "chocolate", "achocolatado",
+  "leite condensado", "suco", "refrigerante", "salsicha", "linguica", "presunto",
+  "mortadela", "nuggets", "salgadinho", "requeijao", "margarina", "cafe", "mate",
+  "uva inteira", "uvas inteiras", "uva", "tomate cereja", "castanha", "amendoim",
+  "noz", "nozes", "pipoca", "passas", "bala", "marshmallow", "rodela", "rodelas",
+  "cenoura crua", "liquidificador", "peneira", "peneirado", "mamadeira",
+  "ovo cru", "gema mole", "leite de vaca", "leite integral", "leite em po",
+  "antialergico", "loratadina", "dipirona", "corticoide", "caldo de legumes",
+  "caldo de carne", "tempero pronto", "espere ate", "evite ate", "adie",
+  "so depois de 1 ano", "nao precisa procurar", "espere passar",
+];
+
+// ---------- estado ----------
+let traces = [];   // [{id, input, output, idade_meses, ...}]
+let rotulos = {};  // id -> {F01..F12: "passa"|"falha"|"na", nota}
 let atual = 0;
 
 const $ = id => document.getElementById(id);
+
+// ---------- normalização (mesmo truque de avaliadores/texto.py) ----------
+function normalizar(s) {
+  let saida = "";
+  for (const ch of s) {
+    const base = ch.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    saida += base.length === 1 ? base.toLowerCase() : ch.toLowerCase();
+  }
+  return saida;
+}
+
+const REGEX_TERMOS = (() => {
+  // termos mais longos primeiro, para "uva inteira" vencer "uva"
+  const partes = [...TERMOS_RISCO].sort((a, b) => b.length - a.length)
+    .map(t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+"));
+  return new RegExp(`(?<![a-z0-9])(?:${partes.join("|")})(?:e?s)?(?![a-z0-9])`, "g");
+})();
+
+function destacar(el, texto) {
+  el.textContent = "";
+  const norm = normalizar(texto);
+  let pos = 0, n = 0;
+  for (const m of norm.matchAll(REGEX_TERMOS)) {
+    if (m.index > pos) el.appendChild(document.createTextNode(texto.slice(pos, m.index)));
+    const marca = document.createElement("mark");
+    marca.textContent = texto.slice(m.index, m.index + m[0].length);
+    el.appendChild(marca);
+    pos = m.index + m[0].length;
+    n++;
+  }
+  el.appendChild(document.createTextNode(texto.slice(pos)));
+  return n;
+}
+
+// ---------- persistência local ----------
+function salvarLocal() {
+  try {
+    localStorage.setItem(CHAVE_STORAGE, JSON.stringify({ rotulos, quando: Date.now() }));
+  } catch { /* storage cheio ou bloqueado: exportação manual continua funcionando */ }
+}
+function restaurarLocal() {
+  try {
+    const bruto = localStorage.getItem(CHAVE_STORAGE);
+    if (!bruto) return 0;
+    const { rotulos: salvos } = JSON.parse(bruto);
+    let n = 0;
+    for (const t of traces) {
+      const s = salvos[t.id];
+      if (!s) continue;
+      rotulos[t.id] = { ...rotulos[t.id], ...s };
+      // conta só o que tem conteúdo real: algum rótulo F* ou nota preenchida
+      if (MODOS.some(([c]) => s[c]) || s.nota?.trim()) n++;
+    }
+    return n;
+  } catch { return 0; }
+}
 
 // ---------- carga ----------
 const zona = $("zona"), inputArquivo = $("arquivo");
@@ -152,14 +273,16 @@ async function carregar(lista) {
       try { novos.push(JSON.parse(l)); }
       catch { console.warn(`linha ${i + 1} inválida, pulada`); }
     }
-    traces = novos;
+    if (novos.length) traces = novos;
   }
   if (!traces.length) { alert("Nenhum trace válido no arquivo."); return; }
-  for (const t of traces) rotulos[t.id] ??= { nota: t.nota_anotador || "" };
+  for (const t of traces) rotulos[t.id] ??= { nota: "" };
+  const restaurados = restaurarLocal();
   zona.classList.add("escondido");
   $("app").classList.remove("escondido");
   atual = 0;
   render();
+  if (restaurados) toast(`rascunho restaurado: ${restaurados} trace(s) com rótulos salvos`);
 }
 
 function importarCsv(texto) {
@@ -178,6 +301,12 @@ function importarCsv(texto) {
   }
 }
 
+// ---------- estado derivado ----------
+const completo = id => MODOS.every(([c]) => rotulos[id][c]);
+const parcial = id => !completo(id) && MODOS.some(([c]) => rotulos[id][c]);
+const temFalha = id => MODOS.some(([c]) => rotulos[id][c] === "falha");
+const completos = () => traces.filter(t => completo(t.id)).length;
+
 // ---------- render ----------
 function render() {
   const t = traces[atual], r = rotulos[t.id];
@@ -189,7 +318,8 @@ function render() {
   $("contagem").textContent = `${atual + 1} / ${traces.length} · ${completos()} completos`;
   $("barra").style.width = `${(completos() / traces.length) * 100}%`;
   $("entrada").textContent = t.input || "(vazio)";
-  $("saida").textContent = t.output || "(vazio)";
+  const n = destacar($("saida"), t.output || "(vazio)");
+  $("qtd-destaques").textContent = n ? `${n} termo(s) de atenção destacado(s) — destaque não é veredito` : "";
   $("nota").value = r.nota || "";
 
   const tabela = $("tabela-modos");
@@ -206,66 +336,109 @@ function render() {
       const b = document.createElement("button");
       b.textContent = valor;
       if (r[codigo] === valor) b.className = `sel-${valor}`;
-      b.onclick = () => { r[codigo] = r[codigo] === valor ? "" : valor; render(); };
+      b.onclick = () => aplicar(codigo, r[codigo] === valor ? "" : valor);
       div.appendChild(b);
     }
     c2.appendChild(div);
   });
+
+  const mapa = $("minimapa");
+  mapa.innerHTML = "";
+  traces.forEach((tr, i) => {
+    const p = document.createElement("button");
+    p.className = "ponto" +
+      (completo(tr.id) ? (temFalha(tr.id) ? " tem-falha completo" : " completo")
+       : parcial(tr.id) ? " parcial" : "") +
+      (i === atual ? " atual" : "");
+    p.title = tr.id;
+    p.onclick = () => { salvarNota(); atual = i; render(); };
+    mapa.appendChild(p);
+  });
+
   $("pendencias").textContent = "";
 }
 
-function completos() {
-  return traces.filter(t => MODOS.every(([c]) => rotulos[t.id][c])).length;
+function aplicar(codigo, valor) {
+  const id = traces[atual].id;
+  rotulos[id][codigo] = valor;
+  salvarLocal();
+  const fechouAgora = valor && completo(id) && $("auto-avancar").checked;
+  render();
+  if (fechouAgora) setTimeout(irPendente, 220);
 }
 
 // ---------- navegação ----------
+function salvarNota() {
+  if (traces[atual]) { rotulos[traces[atual].id].nota = $("nota").value; salvarLocal(); }
+}
 function ir(delta) {
   salvarNota();
   atual = Math.min(traces.length - 1, Math.max(0, atual + delta));
   render();
   window.scrollTo({ top: 0 });
 }
-function salvarNota() { if (traces[atual]) rotulos[traces[atual].id].nota = $("nota").value; }
+function irPendente() {
+  salvarNota();
+  for (let passo = 1; passo <= traces.length; passo++) {
+    const i = (atual + passo) % traces.length;
+    if (!completo(traces[i].id)) { atual = i; render(); window.scrollTo({ top: 0 }); return; }
+  }
+  toast("🎉 todos os traces estão completos — pode exportar");
+}
 $("anterior").onclick = () => ir(-1);
 $("proximo").onclick = () => ir(1);
+$("pendente").onclick = irPendente;
+$("nota").addEventListener("blur", salvarNota);
+$("limpar").onclick = () => {
+  if (confirm("Apagar o rascunho salvo neste navegador? Os rótulos da sessão atual continuam na tela.")) {
+    localStorage.removeItem(CHAVE_STORAGE);
+    toast("rascunho apagado");
+  }
+};
 
 document.addEventListener("keydown", e => {
   if (e.target.tagName === "TEXTAREA" || $("app").classList.contains("escondido")) return;
   if (e.key === "ArrowRight") ir(1);
   else if (e.key === "ArrowLeft") ir(-1);
+  else if (e.key === " ") { e.preventDefault(); irPendente(); }
   else if (/^[1-9]$/.test(e.key)) {
     const codigo = MODOS[Number(e.key) - 1][0];
     const r = rotulos[traces[atual].id];
-    r[codigo] = CICLO[r[codigo] || ""];
-    render();
+    aplicar(codigo, CICLO[r[codigo] || ""]);
   }
 });
 
 // ---------- exportação ----------
 $("exportar").onclick = () => {
   salvarNota();
-  const faltando = traces.filter(t => !MODOS.every(([c]) => rotulos[t.id][c]));
+  const faltando = traces.filter(t => !completo(t.id));
   if (faltando.length) {
     $("pendencias").textContent =
       `⚠ ${faltando.length} trace(s) com rótulo pendente: ` +
       faltando.slice(0, 8).map(t => t.id).join(", ") +
       (faltando.length > 8 ? "…" : "") + " — exportando mesmo assim, células vazias.";
   }
+  const porModo = Object.fromEntries(MODOS.map(([c]) => [c, 0]));
+  for (const t of traces) for (const [c] of MODOS)
+    if (rotulos[t.id][c] === "falha") porModo[c]++;
+
   const colunas = ["trace_id", ...MODOS.map(([c]) => c)];
   const linhas = [colunas.join(",")];
   linhas.push("# Rótulos HUMANOS, um por trace por modo de falha.");
   linhas.push("# Valores: passa | falha | na (modo não se aplica a este trace)");
-  linhas.push(`# Exportado por anotar.html — ${traces.length} traces.`);
+  linhas.push(`# Exportado por anotar.html — ${traces.length} traces, ${completos()} completos.`);
+  linhas.push(`# Falhas por modo: ${MODOS.map(([c]) => `${c}=${porModo[c]}`).join(" ")}`);
   for (const t of traces) {
     const r = rotulos[t.id];
     linhas.push([t.id, ...MODOS.map(([c]) => r[c] || "")].join(","));
   }
   baixar("rotulos.csv", linhas.join("\n") + "\n");
 
-  // notas da codificação aberta vão num arquivo próprio, para não poluir o CSV
+  // notas da codificação aberta em arquivo próprio, para não poluir o CSV
   const notas = traces.filter(t => rotulos[t.id].nota?.trim())
     .map(t => JSON.stringify({ trace_id: t.id, nota: rotulos[t.id].nota.trim() }));
   if (notas.length) baixar("codificacao_aberta.jsonl", notas.join("\n") + "\n");
+  toast(`exportado: ${traces.length} traces` + (notas.length ? ` + ${notas.length} nota(s)` : ""));
 };
 
 function baixar(nome, conteudo) {
@@ -274,6 +447,16 @@ function baixar(nome, conteudo) {
   a.download = nome;
   a.click();
   URL.revokeObjectURL(a.href);
+}
+
+// ---------- toast ----------
+let timerToast;
+function toast(msg) {
+  const el = $("toast");
+  el.textContent = msg;
+  el.classList.add("visivel");
+  clearTimeout(timerToast);
+  timerToast = setTimeout(() => el.classList.remove("visivel"), 2600);
 }
 </script>
 </body>
