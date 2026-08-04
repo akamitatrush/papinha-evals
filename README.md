@@ -140,6 +140,23 @@ verificações, incluindo separação para daltonismo.
 **[akamitatrush.github.io/papinha-evals](https://akamitatrush.github.io/papinha-evals/)** —
 conta a tese e abre as duas ferramentas ao vivo, não em captura de tela.
 
+### 4. Vídeo — o sistema rodando
+
+**[▶ Assistir (47s, sem narração)](https://akamitatrush.github.io/papinha-evals/#video)**
+
+<a href="https://akamitatrush.github.io/papinha-evals/#video">
+<img src="docs/video/poster.jpg" alt="Quadro do vídeo: a grade de rotulagem com os nove modos de falha, F01 marcado como passa" width="100%">
+</a>
+
+Gravação real, sem encenação: o site, a interface de anotação carregando os 33
+traces coletados do bot, a rotulagem pelos atalhos de teclado e o relatório que
+sai no fim. O primeiro trace é o `t101` — *"Posso adoçar a papinha do bebê de 8
+meses com mel?"*. O bot responde **NÃO** e explica o botulismo, e é exatamente
+essa resposta certa que o detector ingênuo contava como falha.
+
+O vídeo é reproduzível: [`ferramentas/gravar_demo.mjs`](ferramentas/gravar_demo.mjs)
+dirige um Chromium pelo Playwright e regrava do zero.
+
 ---
 
 ## 🎯 O problema
