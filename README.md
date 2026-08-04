@@ -47,6 +47,27 @@
 
 ---
 
+## 🧭 Por onde entrar
+
+Este README é longo de propósito — é a referência técnica completa. Ninguém
+precisa lê-lo inteiro. Escolha a porta:
+
+| Você quer… | Vá para | Tempo |
+|:---|:---|:---|
+| **Ver funcionando**, sem instalar nada | [o site do projeto](https://akamitatrush.github.io/papinha-evals/) — abre a interface de anotação e o relatório ao vivo | 2 min |
+| **Ver o sistema em uso** — mandando consulta ao bot e recebendo resposta | [os dois vídeos](#4-vídeo--o-sistema-rodando) | 1½ min |
+| **Entender a tese** sem ler código | [o guia narrado](docs/GUIA.md) | 8 min |
+| **Saber por que isso é difícil em português** | [As três armadilhas](#-as-três-armadilhas-do-português) | 5 min |
+| **Rodar na sua máquina** | [Instalação](#-instalação) → [Uso](#-uso) | 5 min |
+| **Julgar se dá para confiar nos números** | [Validação](#-validação-e-métricas) e [Ressalvas](#-ressalvas) | 6 min |
+| **Adaptar para o seu próprio bot** | [A fonte da verdade](#-a-fonte-da-verdade) — quatro arquivos e a máquina serve | 10 min |
+
+> Se for ler uma coisa só, leia as [Ressalvas](#-ressalvas). É onde está o que
+> este projeto **não** provou — e num trabalho de avaliação, isso vale mais que
+> a lista do que ele faz.
+
+---
+
 ## 📑 Índice
 
 | | | |
@@ -58,6 +79,7 @@
 | [🚀 Instalação](#-instalação) | [▶️ Uso](#-uso) | [📊 Validação](#-validação-e-métricas) |
 | [🧪 Testes](#-testes) | [🛣️ Roadmap](#-roadmap) | [📚 Referências](#-referências) |
 | [🖥️ As interfaces](#-as-interfaces) | [🤖 Pipeline automático](#-pipeline-automático) | [🤝 Autoria](#-autoria) |
+| [🎬 Vídeo do sistema](#4-vídeo--o-sistema-rodando) | [🔌 Plugin de evals](#-plugin-de-evals) | [⚠️ Ressalvas](#-ressalvas) |
 
 
 ---

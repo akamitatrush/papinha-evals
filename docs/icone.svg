@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Marca do projeto: a régua descendo 100 -> 18. O que o projeto mediu é o
+       próprio instrumento, então o ícone é o gráfico, não uma colher. -->
+  <rect width="64" height="64" rx="12" fill="#07080A"/>
+  <rect x="10" y="12" width="8" height="34" rx="2" fill="#FF5F45"/>
+  <rect x="23" y="22" width="8" height="24" rx="2" fill="#FF5F45" opacity=".8"/>
+  <rect x="36" y="28" width="8" height="18" rx="2" fill="#FF5F45" opacity=".6"/>
+  <rect x="49" y="38" width="8" height="8"  rx="2" fill="#2FE3C4"/>
+  <rect x="8" y="49" width="49" height="1.5" rx=".75" fill="#2B323E"/>
+</svg>
