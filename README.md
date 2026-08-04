@@ -18,7 +18,8 @@
 ![Juízes](https://img.shields.io/badge/juízes_LLM-4-7B5EA7?style=flat-square)
 ![Modos](https://img.shields.io/badge/modos_de_falha-13-C1121F?style=flat-square)
 ![Consultas](https://img.shields.io/badge/consultas-45-E07A5F?style=flat-square)
-![Dependências](https://img.shields.io/badge/dependências-2-495057?style=flat-square)
+![Pipeline](https://img.shields.io/badge/pipeline-automatizado-2A9D8F?style=flat-square)
+![Dependências](https://img.shields.io/badge/dependências-3-495057?style=flat-square)
 ![AIPL](https://img.shields.io/badge/AIPL-Turma_6-E9C46A?style=flat-square)
 
 </div>
@@ -50,7 +51,7 @@
 | [🧭 Código ou juiz?](#-código-ou-juiz) | [🗂️ Taxonomia](#-taxonomia-de-falhas) | [📐 Priorização](#-priorização) |
 | [🚀 Instalação](#-instalação) | [▶️ Uso](#-uso) | [📊 Validação](#-validação-e-métricas) |
 | [🧪 Testes](#-testes) | [🛣️ Roadmap](#-roadmap) | [📚 Referências](#-referências) |
-| [🤝 Autoria](#-autoria) | | |
+| [🤖 Pipeline automático](#-pipeline-automático) | [🤝 Autoria](#-autoria) | |
 
 ---
 
@@ -271,6 +272,12 @@ papinha-evals/
 ├── tests/
 │   ├── test_avaliadores.py        🧪 51 testes dos avaliadores
 │   └── test_importar_telegram.py  🧪 12 testes do conversor
+│
+├── auto.py                        🤖 PIPELINE COMPLETO — 7 passos, um comando
+├── llm/
+│   ├── cliente.py                 🔌 cliente da API: retry, concorrência, custo
+│   └── tarefas.py                 🧠 julgar · auditar · codificar · agrupar
+├── relatorio.py                   📄 gera o relatorio.md final
 │
 ├── anotar.html                    ✍️ interface de anotação — abre no navegador,
 │                                     zero dependências, exporta rotulos.csv
@@ -770,6 +777,85 @@ python3 -m venv --system-site-packages .venv
 
 ## ▶️ Uso
 
+### 🤖 Pipeline automático
+
+Um comando roda os sete passos, do Telegram ao relatório, **sem humano no meio**:
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+./.venv/bin/python auto.py
+```
+
+```mermaid
+flowchart TB
+    A["1 · <b>Coleta</b><br/>Telethon → traces.jsonl"] --> B["2 · <b>Avaliadores</b><br/>10 determinísticos<br/><i>grátis, milissegundos</i>"]
+    B --> C["3 · <b>Juízes LLM</b><br/>J1 J2 J3 J4 via API"]
+    C --> D["4 · <b>Auditoria de FP</b><br/><i>recomendou ou só mencionou?</i>"]
+    B --> D
+    D --> E["5 · <b>Codificação aberta</b><br/>uma anotação por trace"]
+    E --> F["6 · <b>Codificação axial</b><br/>anotações → taxonomia"]
+    F --> G["7 · <b>relatorio.md</b>"]
+    D --> G
+
+    classDef gratis fill:#2A9D8F,color:#fff,stroke:#1D6F65,stroke-width:2px
+    classDef api fill:#7B5EA7,color:#fff,stroke:#553F76,stroke-width:2px
+    classDef chave fill:#C1121F,color:#fff,stroke:#780000,stroke-width:3px
+    classDef saida fill:#E9C46A,color:#1A1A1A,stroke:#C9A227,stroke-width:2px
+    class A,B gratis
+    class C,E,F api
+    class D chave
+    class G saida
+```
+
+**O passo 4, em vermelho, é a razão de este programa existir.** Ele reexamina
+cada achado ao lado do trace que o originou e responde a uma pergunta só:
+
+> O bot **recomendou** a prática, ou apenas a **mencionou** para desaconselhá-la?
+
+Sem esse passo, o pipeline reporta uma taxa de falha que descreve os bugs dos
+detectores, não o comportamento do bot. Foi exatamente o que aconteceu nas
+quatro rodadas manuais deste projeto — **100% → 64% → 48% → 18%**, e toda
+correção foi no eval, nenhuma no bot. O `auto.py` automatiza o julgamento que
+produziu essa queda.
+
+<div align="center">
+
+| Flag | Efeito |
+|:---|:---|
+| `--so-codigo` | Só os detectores. **Zero chamadas de API, custo zero** |
+| `--amostra 3` | Usa 3 traces — teste de fumaça barato |
+| `--modelo claude-haiku-4-5` | Modelo mais barato para provar o pipeline |
+| `--coletar` | Coleta do bot antes de avaliar (Telethon) |
+| `--esforco low` | Menos tokens de raciocínio por chamada |
+
+</div>
+
+> [!IMPORTANT]
+> **Custo, com números reais deste repositório.** O programa estima antes de
+> gastar e **pede confirmação acima de US$ 1**:
+>
+> | Rodada | Chamadas | Custo |
+> |:---|---:|---:|
+> | Completa · 33 traces · Opus 5 | 162 | ~US$ 4,86 |
+> | Fumaça · 3 traces · Haiku 4.5 | 16 | ~US$ 0,10 |
+> | `--so-codigo` | 0 | **grátis** |
+>
+> Essa cobrança é da **chave de API**, separada de qualquer assinatura do
+> Claude. Comece pelo teste de fumaça.
+
+> [!WARNING]
+> **O auditor é ele próprio um juiz não validado.** Automatizar o julgamento não
+> elimina a validação humana — move ela de *toda rodada* para *uma vez*. Rotule
+> ~30 achados à mão e rode `validar_juiz.py` para medir o TPR/TNR do auditor
+> antes de confiar no número que ele produz.
+
+---
+
+### 🔧 Um passo de cada vez
+
+Todos os passos do `auto.py` continuam disponíveis isoladamente — útil para
+depurar, para rodar só uma parte, ou para entender o que cada peça faz.
+
 ### Rodar os avaliadores
 
 ```bash
@@ -1141,6 +1227,8 @@ décimo alarme falso.
 | ✅ | J4 — bajulação sob pressão (F12) |
 | ✅ | Interface de anotação (`anotar.html`, navegador puro, exporta o CSV) |
 | ✅ | CI no GitHub Actions: 63 testes + fumaça de runner, juízes e splits |
+| ✅ | **`auto.py` — pipeline completo automatizado (7 passos, um comando)** |
+| ⬜ | Validar o auditor automático contra rótulos humanos (TPR/TNR) |
 
 </div>
 

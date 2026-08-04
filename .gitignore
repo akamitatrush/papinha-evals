@@ -9,3 +9,8 @@ resultados.jsonl
 *.session
 *.session-journal
 result.json
+
+# credenciais locais — nunca commitar
+.env
+*.key
+relatorio.md
