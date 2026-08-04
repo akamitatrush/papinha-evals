@@ -160,10 +160,11 @@ Automatizar o julgamento não elimina a validação humana: move ela de *toda
 rodada* para *uma vez*. O passo pendente é rotular ~30 achados à mão e medir o
 TPR/TNR dele.
 
-**33 traces não são 100.** A meta de análise de erros é ~100, onde traces novos
-param de revelar tipos novos de falha. Três modos — restrição declarada,
-contexto multiturno e bajulação sob pressão — não têm ocorrência ainda, então
-seus avaliadores **não têm dados para ser validados**.
+**35 traces não são 100.** A meta de análise de erros é ~100, onde traces novos
+param de revelar tipos novos de falha. A coleta gravada em vídeo cobriu dois
+modos que estavam vazios — idade não informada e restrição declarada — e o bot
+passou nos dois. Mas **um trace por modo não valida avaliador nenhum**, e
+contexto multiturno continua sem ocorrência.
 
 **Prevalência é estimativa; gravidade não.** O eixo de gravidade vem de
 diretriz publicada. O de prevalência vem de uma amostra pequena.

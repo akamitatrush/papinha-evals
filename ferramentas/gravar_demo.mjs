@@ -19,6 +19,10 @@ import { fileURLToPath } from "node:url";
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const EXEC = process.env.PLAYWRIGHT_CHROMIUM || undefined;
 const SAIDA = join(REPO, "docs", "video");
+// O Playwright grava com nome aleatório num diretório que ele controla; usar
+// docs/video direto significaria apagá-lo antes de cada gravação, levando junto
+// o clipe da coleta. Grava aqui e move só o arquivo desta execução.
+const TEMP = join(SAIDA, ".bruto");
 
 const pausa = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -36,28 +40,21 @@ async function rolarPx(p, px, ms = 1200) {
   await pausa(ms);
 }
 
-rmSync(SAIDA, { recursive: true, force: true });
-mkdirSync(SAIDA, { recursive: true });
+rmSync(TEMP, { recursive: true, force: true });
+mkdirSync(TEMP, { recursive: true });
 
 const navegador = await chromium.launch({ executablePath: EXEC, args: ["--no-sandbox"] });
 const ctx = await navegador.newContext({
   viewport: { width: 1440, height: 810 },
   deviceScaleFactor: 2,
   colorScheme: "dark",   // anotador e relatório seguem o esquema do sistema
-  recordVideo: { dir: SAIDA, size: { width: 1440, height: 810 } },
+  recordVideo: { dir: TEMP, size: { width: 1440, height: 810 } },
 });
 const p = await ctx.newPage();
 
-// ── 1. o site ───────────────────────────────────────────────────────────────
-await p.goto(`file://${REPO}/docs/index.html`);
-await p.waitForTimeout(2600);            // deixa a abertura do hero rodar
-await rolarPx(p, 700, 2000);             // faixa de telemetria
-await rolar(p, "#tese", 2600);           // gráfico das quatro medições
-await rolarPx(p, 620, 2600);             // legenda das rodadas + veredito
-await rolar(p, "#metodo", 2400);
-await rolar(p, "#achados", 2600);        // a contradição t102 / t107
-
-// ── 2. a interface de anotação, com os traces reais ─────────────────────────
+// ── 1. a interface de anotação, com os traces reais ─────────────────────────
+// Sem passeio pelo site: este clipe é sobre avaliar traces. Quem quer ver o
+// site já está nele.
 await p.goto(`file://${REPO}/anotar.html`);
 // O tema escuro do anotador tem um bloco próprio em html[data-tema] — o
 // prefers-color-scheme do contexto não cobre tudo.
@@ -88,7 +85,7 @@ await pausa(1400);
 await p.click("#proximo");
 await pausa(1800);
 
-// ── 3. o relatório ──────────────────────────────────────────────────────────
+// ── 2. o relatório ──────────────────────────────────────────────────────────
 await p.goto(`file://${REPO}/docs/relatorio-exemplo.html`);
 await p.waitForTimeout(2600);            // número herói: precisão dos avaliadores
 await rolarPx(p, 620, 2400);
@@ -99,6 +96,7 @@ await pausa(1200);
 await ctx.close();
 await navegador.close();
 
-const arq = readdirSync(SAIDA).find((f) => f.endsWith(".webm"));
-renameSync(join(SAIDA, arq), join(SAIDA, "demo.webm"));
+const arq = readdirSync(TEMP).find((f) => f.endsWith(".webm"));
+renameSync(join(TEMP, arq), join(SAIDA, "demo.webm"));
+rmSync(TEMP, { recursive: true, force: true });
 console.log("gravado:", join(SAIDA, "demo.webm"));

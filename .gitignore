@@ -15,3 +15,6 @@ result.json
 *.key
 relatorio.md
 relatorio.html
+
+# dependências só do gravador de vídeo (ferramentas/gravar_*.mjs)
+node_modules/
