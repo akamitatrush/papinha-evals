@@ -157,8 +157,20 @@ Isto não é modéstia — é parte do resultado.
 **O auditor automático não está validado.** Ele é um juiz não medido, e nos
 testes classificou o mesmo achado de formas diferentes em execuções distintas.
 Automatizar o julgamento não elimina a validação humana: move ela de *toda
-rodada* para *uma vez*. O passo pendente é rotular ~30 achados à mão e medir o
-TPR/TNR dele.
+rodada* para *uma vez*.
+
+O caminho para fechar isso está pronto e é de quatro comandos:
+
+```bash
+./.venv/bin/python analise_erros/preparar_rotulagem.py     # 1. prepara o CSV
+#                     2. rotule em anotar.html e exporte
+./.venv/bin/python rodar_evals.py dados/traces.jsonl \
+    --saida analise_erros/predicoes_reais.jsonl            # 3. predições
+./.venv/bin/python validar_todos.py                        # 4. TPR/TNR
+```
+
+Enquanto o passo 2 não acontecer, o relatório abre com um aviso dizendo que os
+avaliadores **não estão medidos** — e é honesto que abra.
 
 **35 traces não são 100.** A meta de análise de erros é ~100, onde traces novos
 param de revelar tipos novos de falha. A coleta gravada em vídeo cobriu dois

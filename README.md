@@ -1244,10 +1244,40 @@ TPR (sensibilidade)  = VP / (VP + FN)   →  pega as falhas que existem
 TNR (especificidade) = VN / (VN + FP)   →  não inventa falhas que não existem
 ```
 
+#### O ciclo completo, em quatro comandos
+
 ```bash
-# validar avaliadores de código contra o padrão-ouro
-./.venv/bin/python rodar_evals.py dados/traces.jsonl --saida achados.jsonl
-./.venv/bin/python validar_juiz.py --predicoes achados.jsonl --modo F01
+# 1. prepara o CSV de rotulagem, já com os `na` estruturais marcados
+./.venv/bin/python analise_erros/preparar_rotulagem.py
+
+# 2. rotule — abra anotar.html, arraste dados/traces.jsonl, teclas 1-9, exporte
+#    (ou edite analise_erros/rotulos_reais.csv à mão)
+
+# 3. gera as predições dos avaliadores sobre os mesmos traces
+./.venv/bin/python rodar_evals.py dados/traces.jsonl --saida analise_erros/predicoes_reais.jsonl
+
+# 4. mede TPR/TNR de todos os modos de uma vez
+./.venv/bin/python validar_todos.py
+```
+
+O passo 4 grava `analise_erros/validacao.json`, e o relatório passa a abrir com
+**precisão medida** em vez da precisão *estimada* pelo auditor automático — que
+é ele próprio um juiz não medido.
+
+O passo 1 existe porque rotular 35 traces × 9 modos são 315 células, e boa parte
+delas não é nem uma pergunta: *"o bot ignorou a restrição declarada?"* não tem
+resposta possível quando o cuidador não declarou restrição nenhuma. O script
+marca essas como `na` olhando **só a dimensão da pergunta**, nunca a resposta do
+bot — marcar a partir da resposta seria pré-julgar o que o humano tem de
+decidir. Sobram 171 células de julgamento real, e qualquer `na` pode ser
+sobrescrito.
+
+<details>
+<summary>Comandos por modo, para iterar num avaliador específico</summary>
+
+```bash
+# um modo de cada vez, com a lista dos falsos negativos
+./.venv/bin/python validar_juiz.py --predicoes analise_erros/predicoes_reais.jsonl --modo F01
 
 # ver os splits antes de montar os few-shot do juiz
 ./.venv/bin/python validar_juiz.py --modo F03 --so-splits
@@ -1255,6 +1285,8 @@ TNR (especificidade) = VN / (VN + FP)   →  não inventa falhas que não existe
 # corrigir a taxa observada pelo viés do avaliador
 ./.venv/bin/python validar_juiz.py --predicoes achados.jsonl --modo F03 --taxa-observada 0.23
 ```
+
+</details>
 
 ### Os três splits
 
@@ -1431,7 +1463,7 @@ Feito a quatro mãos, em sessão de pareamento:
 
 | | |
 |:---:|:---|
-| 👨‍💻 | **[Sérgio Hasher](https://github.com/akamitatrush)** — direção do projeto, domínio, decisões de escopo, e a parte que nenhuma automação substitui: coletar e rotular os traces reais |
+| 👨‍💻 | **[Sérgio](https://github.com/akamitatrush)** — direção do projeto, domínio, decisões de escopo, e a parte que nenhuma automação substitui: coletar e rotular os traces reais |
 | 🤖 | **Claude** (Opus 5, via [Claude Code](https://claude.com/claude-code)) — implementação dos avaliadores, juízes, harness de validação, interface de anotação e documentação |
 
 O processo espelhou o que o projeto prega: cada detector nasceu com testes de
@@ -1445,6 +1477,6 @@ primeiro bug encontrado pela suíte estava — como sempre — na própria suít
 
 <br>
 
-<sub>🍲 Sérgio Hasher & Claude — construído junto, commit a commit</sub>
+<sub>🍲 Sérgio & Claude — construído junto, commit a commit</sub>
 
 </div>

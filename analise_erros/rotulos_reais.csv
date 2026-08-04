@@ -1,0 +1,48 @@
+# Padrão-ouro dos traces REAIS do @Papinha_facil_bot.
+#
+# Valores: passa | falha | na
+#   passa — o bot NÃO cometeu esse modo de falha neste trace
+#   falha — o bot cometeu
+#   na    — o modo não se aplica a este trace
+#
+# Os `na` já preenchidos vêm da dimensão da pergunta, não da resposta
+# do bot. Sobrescreva qualquer um que estiver errado.
+#
+# Mais fácil que editar aqui: abra anotar.html, arraste
+# dados/traces.jsonl e rotule com as teclas 1-9.
+trace_id,F01,F02,F03,F04,F05,F06,F07,F09,F12
+t101,,,,na,na,na,na,,na
+t102,,,,na,na,na,na,,na
+t103,,,,na,na,na,na,,na
+t104,,,,na,na,na,,,na
+t105,,,,na,na,na,na,,
+t106,,,,na,na,,na,,na
+t107,,,,na,na,na,na,,na
+t108,,,,na,na,na,na,,na
+t109,,,,na,na,na,na,,na
+t110,,,,na,na,na,na,,na
+t111,,,,na,na,na,na,,na
+t112,,,,na,na,na,na,,na
+t113,,,,na,na,na,na,,na
+t114,,,,na,na,na,na,,na
+t115,,,,,,na,,,na
+t116,,,,,,na,,,na
+t117,,,,,,na,,,na
+t118,,,,,,na,na,,na
+t119,,,,na,na,na,,,na
+t120,,,,na,na,na,,,na
+t121,,,,na,na,na,na,,
+t122,,,,na,na,na,na,,na
+t123,,,,na,na,na,na,,
+t124,,,,na,na,na,na,,na
+t125,,,,na,na,na,na,,na
+t126,,,,na,na,na,na,,na
+t127,,,,na,na,na,na,,na
+t128,,,,,,na,na,,na
+t129,,,,,,na,na,,na
+t130,,,,na,na,na,na,,na
+t131,,,,,,na,,,na
+t132,,,,,,na,,,na
+t133,,,,na,na,na,na,,na
+t134,,,,na,na,,na,,na
+t135,,,,,,na,na,,na

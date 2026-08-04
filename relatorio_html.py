@@ -19,6 +19,7 @@ de humano. Status nunca carrega significado sozinho — sempre acompanha rótulo
 from __future__ import annotations
 
 import html
+import json
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -191,6 +192,69 @@ def _barras_empilhadas(linhas, maximo) -> str:
     return "".join(out)
 
 
+def _secao_validacao(raiz: Path) -> str:
+    """Bloco de TPR/TNR medidos contra rótulo humano.
+
+    Só aparece quando analise_erros/validacao.json existe. Sem ele o relatório
+    abre com a precisão *estimada* pelo auditor — que é ele próprio um juiz não
+    medido. Esta seção é a única coisa aqui que não depende de nenhum LLM.
+    """
+    caminho = raiz / "analise_erros" / "validacao.json"
+    if not caminho.exists():
+        return (
+            '<h2>Validação contra rótulo humano</h2>'
+            '<p class="dica">Ainda não feita — nenhum <code>validacao.json</code>.</p>'
+            '<div class="alerta aviso"><b>Os avaliadores não estão medidos</b>'
+            'Sem TPR/TNR, cada avaliador é uma opinião automatizada. Rotule uma '
+            'amostra em <code>anotar.html</code> e rode <code>validar_todos.py</code> '
+            'para substituir a precisão estimada por precisão medida.</div>'
+        )
+
+    d = json.loads(caminho.read_text(encoding="utf-8"))
+    meta = d.get("meta", 0.9)
+    linhas = []
+    for modo, v in sorted(d.get("modos", {}).items()):
+        if not v.get("n"):
+            linhas.append(
+                f'<tr><td class="mono">{_e(modo)}</td><td>{_e(v["avaliador"])}</td>'
+                f'<td class="mono">—</td><td class="mono">—</td><td class="mono">—</td>'
+                f'<td>sem rótulo</td></tr>')
+            continue
+        tpr, tnr = v.get("tpr"), v.get("tnr")
+        def _p(x):
+            return "—" if x is None else f"{x:.0%}"
+        def _c(x):
+            if x is None:
+                return "var(--tinta-fina)"
+            return "var(--ok-viva)" if x >= meta else "var(--real-viva)"
+        veredito = ("confiável" if (tpr or 0) >= meta and (tnr or 0) >= meta
+                    else "não confiável ainda")
+        linhas.append(
+            f'<tr><td class="mono">{_e(modo)}</td><td>{_e(v["avaliador"])}</td>'
+            f'<td class="mono">{v["n"]}</td>'
+            f'<td class="mono" style="color:{_c(tpr)}">{_p(tpr)}</td>'
+            f'<td class="mono" style="color:{_c(tnr)}">{_p(tnr)}</td>'
+            f'<td>{veredito}</td></tr>')
+
+    n = d.get("n_rotulos", 0)
+    aviso = ""
+    if n < 40:
+        aviso = ('<div class="alerta aviso"><b>Amostra pequena</b>'
+                 f'{n} traces rotulados. A meta é ~100, com 30 a 50 de cada classe. '
+                 'Abaixo disso o intervalo de confiança do TPR/TNR é largo demais '
+                 'para decidir alguma coisa — o número serve de sinal, não de prova.</div>')
+
+    return (
+        '<h2>Validação contra rótulo humano</h2>'
+        f'<p class="dica">Classe positiva é <b>falha</b>. TPR é quanto o avaliador '
+        f'pega do que o humano marcou como falha; TNR é quanto ele deixa passar do '
+        f'que o humano marcou como correto. Meta: {meta:.0%} nos dois.</p>'
+        '<div class="rolo"><table><thead><tr><th>modo</th><th>avaliador</th>'
+        '<th>n</th><th>TPR</th><th>TNR</th><th>veredito</th></tr></thead>'
+        f'<tbody>{"".join(linhas)}</tbody></table></div>{aviso}'
+    )
+
+
 def gerar_html(caminho: Path, traces, brutos, revisar, auditados, anotacoes,
                taxonomia, uso, inicio, modelo) -> None:
     fim = datetime.now(timezone.utc)
@@ -241,6 +305,7 @@ def gerar_html(caminho: Path, traces, brutos, revisar, auditados, anotacoes,
     # ── auditoria: herói + composição ──
     if auditados:
         classe = "alta" if precisao >= .8 else ("media" if precisao >= .5 else "baixa")
+        p.append(_secao_validacao(Path(__file__).resolve().parent))
         p.append('<h2>Auditoria dos achados</h2>')
         p.append('<p class="dica">Cada achado foi reexaminado ao lado do trace que o '
                  'originou, com uma pergunta só: <b>o bot recomendou a prática, ou '

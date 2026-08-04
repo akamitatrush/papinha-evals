@@ -531,7 +531,8 @@ footer a:hover{color:var(--sinal);border-bottom-color:var(--sinal)}
       <div class="ress"><h4>O auditor não está validado</h4>
         <p>O pipeline usa um LLM para decidir se cada achado procede — ele próprio um
            juiz não medido, que deu respostas diferentes para o mesmo caso em execuções
-           distintas.</p></div>
+           distintas. O caminho para medir está pronto (<code>validar_todos.py</code>);
+           falta rotular a amostra à mão.</p></div>
       <div class="ress"><h4>35 traces não são 100</h4>
         <p>A coleta gravada acima cobriu dois modos que estavam sem nenhuma ocorrência
            — e o bot passou nos dois. Um trace por modo não valida avaliador nenhum.</p></div>
@@ -564,7 +565,7 @@ footer a:hover{color:var(--sinal);border-bottom-color:var(--sinal)}
        com Lucas Rocha. Método apoiado nas
        <a href="https://github.com/hamelsmu/evals-skills">eval skills de Hamel Husain</a>.</p>
     <p style="margin-top:.6rem">Feito a quatro mãos por
-       <a href="https://github.com/akamitatrush">Sérgio Hasher</a> e
+       <a href="https://github.com/akamitatrush">Sérgio</a> e
        <a href="https://claude.com/claude-code">Claude</a>.</p>
     <p class="saude">Material didático. As regras de segurança seguem o Guia Alimentar para
        Crianças Brasileiras Menores de 2 Anos (Ministério da Saúde, 2021), o Manual de
