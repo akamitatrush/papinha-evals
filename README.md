@@ -882,26 +882,28 @@ open anotar.html          # macOS
 > Nada sai do navegador: sem servidor, sem telemetria, sem dependências. Dá
 > para mandar o arquivo no grupo da turma e cada pessoa rotula um lote.
 
-### Coletar traces reais — três rotas
+### Coletar traces reais — quatro rotas
 
 ```mermaid
 flowchart LR
     A["💬 <b>Conversa</b><br/>@Papinha_facil_bot"] --> B["📱 Rota 1<br/><b>colar na mão</b>"]
     A --> C["🖥️ Rota 2 ★<br/><b>export do Desktop</b><br/>+ importar_telegram.py"]
-    A --> D["🤖 Rota 3<br/><b>Telethon</b><br/>enviar_consultas.py"]
+    A --> D["🤖 Rota 3<br/><b>agente + QR</b><br/>Telegram Web"]
+    A --> F["⚙️ Rota 4<br/><b>Telethon</b><br/>enviar_consultas.py"]
     B --> E["<b>dados/traces.jsonl</b>"]
     C --> E
     D --> E
+    F --> E
 
     classDef n fill:#495057,color:#fff,stroke:#212529,stroke-width:2px
     classDef rec fill:#2A9D8F,color:#fff,stroke:#1D6F65,stroke-width:2px
     classDef alvo fill:#E9C46A,color:#1A1A1A,stroke:#C9A227,stroke-width:2px
-    class A,B,D n
+    class A,B,D,F n
     class C rec
     class E alvo
 ```
 
-O bot é do professor — a API de bots do Telegram só serve ao dono. As três
+O bot é do professor — a API de bots do Telegram só serve ao dono. As quatro
 rotas passam pela **sua** conta, que é exatamente o uso que a aula pede.
 
 **Rota 1 — colar na mão.** Funciona, mas com 45 consultas cansa e convida erro
@@ -920,9 +922,53 @@ várias mensagens, e **casa o texto com `dados/consultas.jsonl`** (exato ou
 fuzzy) para herdar `query_id` e `idade_meses`. Perguntas fora do kit entram
 como avulsas, com a idade extraída por regex. Zero credenciais.
 
-**Rota 3 — automação total (Telethon).** Um script envia as consultas pela sua
-conta e captura as respostas sozinho, com suporte a multiturno (q034) e
-retomada:
+**Rota 3 — agente dirigindo o Telegram Web (a que usamos aqui).** Você faz o
+login por QR code e o agente de IA opera a sessão: abre o chat, envia as
+consultas do kit, espera a resposta estabilizar e monta o `traces.jsonl`.
+
+<details>
+<summary><b>Como reproduzir passo a passo</b></summary>
+
+Peça ao seu agente (Claude Code, Cowork, o que você usar com controle de
+navegador) para abrir `https://web.telegram.org/a/`. Vai aparecer um QR code.
+
+1. No **celular**: Telegram → Configurações → **Dispositivos** → **Conectar
+   dispositivo** → aponte para o QR.
+2. Pronto. **Sua senha e o código de login nunca passam pelo agente** — a
+   aprovação acontece inteira no seu aparelho. É a diferença entre *"assuma o
+   controle"* e *"me passe suas credenciais"*: só a primeira é aceitável.
+3. Combine o escopo antes: falar **só** com o `@Papinha_facil_bot`, enviar
+   **só** as consultas do kit.
+4. Ao terminar, **revogue a sessão** em Configurações → Dispositivos.
+
+O helper que injetamos na página faz o trabalho chato — enviar, esperar a
+resposta parar de crescer (o bot escreve em streaming) e parear
+pergunta→resposta:
+
+```js
+// espera a última mensagem do bot ficar estável por 4s antes de capturar
+async perguntar(texto, timeoutMs = 120000) {
+  const antes = this.contarBot();
+  await this.enviar(texto);
+  // ... aguarda surgir mensagem nova, depois aguarda o texto estabilizar
+}
+```
+
+**Duas pedras no caminho, para você não tropeçar nelas:**
+
+- O `Enter` não envia no Telegram Web sob automação — a mensagem fica no
+  rascunho. Clique no botão de enviar.
+- A ponte navegador → disco: o download do painel não chega ao filesystem, e
+  20 KB de texto não passam bem por argumento de shell. Subimos um receptor
+  HTTP local (`127.0.0.1`) e a página faz `POST` do JSONL. Se fizer o mesmo,
+  **escreva num arquivo de staging, nunca direto no `traces.jsonl`** — um
+  `curl` de teste sobrescreveu o nosso na primeira tentativa (o git salvou).
+
+</details>
+
+**Rota 4 — automação total por script (Telethon).** Sem navegador: um script
+envia as consultas pela sua conta e captura as respostas, com suporte a
+multiturno (q034) e retomada:
 
 ```bash
 ./.venv/bin/pip install telethon
