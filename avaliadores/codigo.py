@@ -57,10 +57,43 @@ class Achado:
         return asdict(self)
 
 
+# "8 meses", "um ano", "1 ano e meio", "7 mesinhos". Procuramos no INPUT, nunca
+# no output: o bot dizendo "para bebês de 6 meses" não é o usuário informando.
+_IDADE_RE = re.compile(
+    r"\b(\d{1,2})\s*mes(?:es|inhos?|inho)?\b"
+    r"|\b(?:(\d{1,2})|um|uma)\s*ano(s)?\b"
+)
+
+
+def extrair_idade(texto: str) -> int | None:
+    """Idade em meses declarada no texto, ou None.
+
+    Existe porque um trace cru — CSV exportado, log de produção — não traz
+    `idade_meses` como campo. Sem isto o avaliador conclui "idade não
+    informada" para toda conversa em que ela estava escrita na pergunta, e
+    acusa de falha uma resposta correta.
+    """
+    m = _IDADE_RE.search(T.normalizar(texto or ""))
+    if not m:
+        return None
+    if m.group(1):                                  # "8 meses"
+        meses = int(m.group(1))
+    else:                                           # "um ano", "2 anos"
+        meses = int(m.group(2) or 1) * 12
+    if re.search(r"\be meio\b", T.normalizar(texto)[m.end():m.end() + 12]):
+        meses += 6
+    return meses
+
+
 def _idade(trace: dict) -> tuple[int, bool]:
     """Idade em meses e se ela foi presumida."""
     v = trace.get("idade_meses")
-    return (IDADE_PADRAO, True) if v is None else (int(v), False)
+    if v is not None:
+        return int(v), False
+    do_texto = extrair_idade(trace.get("input", ""))
+    if do_texto is not None:
+        return do_texto, False                      # informada, só que em prosa
+    return IDADE_PADRAO, True
 
 
 # Marcadores fortes: bastam sozinhos para caracterizar uma receita.
@@ -78,6 +111,27 @@ _RECEITA_FRACA = ["preparo", "cozinhe", "cozinhar", "amasse", "refogue", "mistur
                   "leve ao fogo", "asse", "porcao"]
 
 _MIN_MARCAS_FRACAS = 3
+
+
+_INGREDIENTES_RE = re.compile(r"\bingredientes?\s*:")
+# Nem toda receita escreve "modo de preparo". Passos numerados depois da lista
+# de ingredientes cumprem o mesmo papel, e exigir a frase literal custou oito
+# falsos negativos num split de 81 — o erro que dói neste domínio.
+_PREPARO_RE = re.compile(r"\bmodo de (preparo|fazer)\b|\bpreparo\s*:|"
+                         r"\bcomo (preparar|fazer)\s*:"
+                         r"|^\s*\d+\s*[.)]\s+\S", re.M)
+
+
+def receita_completa(saida: str) -> bool:
+    """Receita COMPLETA: lista de ingredientes E modo de preparo.
+
+    Mais estrita que `parece_receita` de propósito. O critério de verificação
+    de idade só falha quando uma receita completa foi entregue — "posso dar
+    gelatina?" respondida com orientação longa não é receita, e tratá-la como
+    tal custou 18 falsos positivos num split de 81.
+    """
+    norm = T.normalizar(saida)
+    return bool(_INGREDIENTES_RE.search(norm) and _PREPARO_RE.search(norm))
 
 
 def parece_receita(saida: str) -> bool:
@@ -318,17 +372,18 @@ _PERGUNTA_IDADE = ["quantos meses", "qual a idade", "qual e a idade", "idade do 
 
 
 def av_idade_assumida(trace: dict, regras: dict) -> Achado:
-    if trace.get("idade_meses") is not None:
+    idade, presumida = _idade(trace)
+    if not presumida:
         return Achado("idade_assumida", trace["id"], "passa",
-                      justificativa="Idade foi informada pelo usuário.")
+                      justificativa=f"Idade informada pelo usuário ({idade} meses).")
 
     saida = trace.get("output", "")
-    receita = parece_receita(saida)
+    receita = receita_completa(saida)
     perguntas = T.buscar(saida, _PERGUNTA_IDADE, checar_negacao=False)
 
     if not receita:
         return Achado("idade_assumida", trace["id"], "passa",
-                      justificativa="Idade não informada, mas a resposta não entrega receita."
+                      justificativa="Idade não informada, mas a resposta não entrega receita completa."
                       + (" O bot perguntou a idade." if perguntas else ""))
 
     # A ORDEM importa, e não bastava procurar a pergunta em qualquer lugar do

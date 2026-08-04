@@ -130,6 +130,28 @@ h2{font-family:var(--sans);font-weight:500;font-size:1.45rem;letter-spacing:-.03
 .cel.passa{background:transparent;border-color:var(--ok);color:var(--ok-viva)}
 
 .rolo{overflow-x:auto}
+.matrizes{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));
+  gap:1rem;margin-top:1rem}
+.matriz{margin:0;border:1px solid var(--regua);border-radius:4px;
+  background:var(--superficie);padding:.9rem 1rem 1rem}
+.matriz figcaption{display:flex;align-items:baseline;gap:.5rem;margin-bottom:.6rem}
+.matriz figcaption b{font-family:var(--mono);font-size:.8rem;color:var(--acento)}
+.matriz figcaption span{font-size:.75rem;color:var(--tinta-fina)}
+.matriz table{width:100%;margin:0;border-collapse:separate;border-spacing:2px}
+.matriz th{font-family:var(--mono);font-size:.55rem;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--tinta-fina);border:none;padding:.2rem;
+  text-align:center;font-weight:500;line-height:1.4}
+.matriz tbody th{text-align:right;padding-right:.5rem}
+.matriz th i{font-style:normal;color:var(--tinta-meia)}
+.matriz td{text-align:center;padding:.6rem .3rem;border:none;border-radius:3px;
+  font-family:var(--mono);font-size:1.25rem;font-weight:700;line-height:1.1;
+  background:var(--papel);vertical-align:middle}
+.matriz td span{display:block;font-size:.5rem;font-weight:500;letter-spacing:.1em;
+  color:var(--tinta-fina);margin-top:.15rem}
+.matriz td.ok{color:var(--tinta-meia)}
+.matriz td.fp{color:var(--pendente-viva);background:rgba(195,134,24,.1)}
+.matriz td.fn{color:var(--real-viva);background:rgba(168,63,46,.16);
+  box-shadow:inset 0 0 0 1px var(--real)}
 table{width:100%;border-collapse:collapse;margin-top:1rem;font-size:.875rem}
 th{text-align:left;font-family:var(--mono);font-size:.625rem;letter-spacing:.14em;
   text-transform:uppercase;color:var(--tinta-fina);font-weight:500;
@@ -238,6 +260,10 @@ def _secao_validacao(raiz: Path) -> str:
             f'<td class="mono" style="color:{_c(f1)}">{_p(f1)}</td>'
             f'<td>{veredito}</td></tr>')
 
+    matrizes = "".join(
+        _matriz(m, v) for m, v in sorted(d.get("modos", {}).items()) if v.get("n")
+    )
+
     n = d.get("n_rotulos", 0)
     aviso = ""
     if n < 40:
@@ -255,7 +281,33 @@ def _secao_validacao(raiz: Path) -> str:
         '<div class="rolo"><table><thead><tr><th>modo</th><th>avaliador</th>'
         '<th>n</th><th>TPR</th><th>TNR</th><th>F1</th><th>veredito</th></tr></thead>'
         f'<tbody>{"".join(linhas)}</tbody></table></div>{aviso}'
+        + (f'<p class="dica" style="margin-top:2rem">Cada avaliador em quatro '
+           f'caixas. A diagonal é acerto; fora dela, discordância. Neste domínio '
+           f'os dois erros não custam o mesmo: um <b>falso positivo</b> gasta '
+           f'tempo de revisão, um <b>falso negativo</b> deixa passar mel para um '
+           f'bebê de 8 meses. Por isso o FN vem destacado.</p>'
+           f'<div class="matrizes">{matrizes}</div>' if matrizes else "")
     )
+
+
+def _matriz(modo: str, v: dict) -> str:
+    """Matriz de confusão de um modo. FN destacado: é o erro que dói aqui."""
+    return f"""
+<figure class="matriz">
+  <figcaption><b>{_e(modo)}</b> <span>{_e(v["avaliador"])}</span></figcaption>
+  <table>
+    <thead><tr><th></th>
+      <th>humano<br><i>falha</i></th><th>humano<br><i>passa</i></th></tr></thead>
+    <tbody>
+      <tr><th>avaliador <i>falha</i></th>
+        <td class="ok">{v["vp"]}<span>VP</span></td>
+        <td class="fp">{v["fp"]}<span>FP</span></td></tr>
+      <tr><th>avaliador <i>passa</i></th>
+        <td class="fn">{v["fn"]}<span>FN</span></td>
+        <td class="ok">{v["vn"]}<span>VN</span></td></tr>
+    </tbody>
+  </table>
+</figure>"""
 
 
 def gerar_html(caminho: Path, traces, brutos, revisar, auditados, anotacoes,

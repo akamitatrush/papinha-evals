@@ -60,7 +60,7 @@ def main() -> int:
     if not args.predicoes.exists():
         raise SystemExit(f"{args.predicoes} não existe. Rode:\n"
                          f"  python rodar_evals.py dados/traces.jsonl "
-                         f"--saida {args.predicoes.relative_to(RAIZ)}")
+                         f"--saida {args.predicoes}")
 
     resultado = {"meta": META, "modos": {}}
     print(f"\n{NEGRITO}Validação contra rótulo humano{FIM}")
@@ -102,7 +102,11 @@ def main() -> int:
 
     args.saida.write_text(json.dumps(resultado, ensure_ascii=False, indent=1),
                           encoding="utf-8")
-    print(f"\n{VERDE}gravado em {args.saida.relative_to(RAIZ)}{FIM}")
+    try:                                    # caminho relativo pode ser de fora
+        onde = args.saida.relative_to(RAIZ)
+    except ValueError:
+        onde = args.saida
+    print(f"\n{VERDE}gravado em {onde}{FIM}")
 
     if resultado["n_rotulos"] < 40:
         print(f"{AMARELO}Amostra pequena.{FIM} {CINZA}A meta é ~100 traces rotulados. "

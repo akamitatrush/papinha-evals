@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import io
 import json
 import re
 import sys
@@ -95,13 +96,25 @@ def ler(caminho: Path) -> tuple[list[str], list[dict]]:
     else:
         raise SystemExit(f"não consegui decodificar {caminho}")
 
-    amostra = texto[:8192]
+    # StringIO, não splitlines(): as respostas do bot têm parágrafos, e
+    # splitlines() corta as quebras de linha DENTRO dos campos entre aspas.
+    # Um CSV de 195 conversas virava 1284 "linhas".
+    def ler_com(dialeto):
+        leitor = csv.DictReader(io.StringIO(texto), dialect=dialeto)
+        return (leitor.fieldnames or []), list(leitor)
+
+    # O padrão (vírgula, aspas duplas) primeiro. O Sniffer erra em CSV com
+    # texto longo entre aspas — nesse mesmo arquivo ele inferiu um dialeto que
+    # transformou 195 conversas em 739. Só recorremos a ele se o padrão
+    # claramente não serviu.
+    colunas, linhas = ler_com(csv.excel)
+    if len(colunas) > 1:
+        return colunas, linhas
+
     try:
-        dialeto = csv.Sniffer().sniff(amostra, delimiters=",;\t|")
+        return ler_com(csv.Sniffer().sniff(texto[:8192], delimiters=";\t|,"))
     except csv.Error:
-        dialeto = csv.excel                     # vírgula, o padrão
-    leitor = csv.DictReader(texto.splitlines(), dialect=dialeto)
-    return (leitor.fieldnames or []), list(leitor)
+        return colunas, linhas
 
 
 def main() -> int:
