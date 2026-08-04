@@ -8,13 +8,14 @@
 
 <br>
 
+![CI](https://github.com/akamitatrush/papinha-evals/actions/workflows/testes.yml/badge.svg)
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![YAML](https://img.shields.io/badge/YAML-regras-CB171E?style=for-the-badge&logo=yaml&logoColor=white)
 ![pytest](https://img.shields.io/badge/pytest-51_passando-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)
 ![Licença](https://img.shields.io/badge/licença-MIT-2A9D8F?style=for-the-badge)
 
 ![Avaliadores](https://img.shields.io/badge/avaliadores_de_código-10-2D6A9F?style=flat-square)
-![Juízes](https://img.shields.io/badge/juízes_LLM-3-7B5EA7?style=flat-square)
+![Juízes](https://img.shields.io/badge/juízes_LLM-4-7B5EA7?style=flat-square)
 ![Modos](https://img.shields.io/badge/modos_de_falha-13-C1121F?style=flat-square)
 ![Consultas](https://img.shields.io/badge/consultas-45-E07A5F?style=flat-square)
 ![Dependências](https://img.shields.io/badge/dependências-2-495057?style=flat-square)
@@ -99,7 +100,7 @@ flowchart TB
         direction TB
         TXT["<b>texto.py</b><br/>acento · fronteira · negação"]
         COD["<b>codigo.py</b><br/>10 avaliadores<br/>determinísticos"]
-        JUI["<b>juizes/</b><br/>3 LLM-as-judge<br/>J1 · J2 · J3"]
+        JUI["<b>juizes/</b><br/>4 LLM-as-judge<br/>J1 · J2 · J3 · J4"]
         TXT --> COD
     end
 
@@ -245,7 +246,8 @@ papinha-evals/
 │   └── juizes/
 │       ├── J1_textura_idade.md         ⚖️ F03 — textura × idade
 │       ├── J2_restricao_declarada.md   ⚖️ F05, F11 — restrição alimentar
-│       └── J3_manejo_alergenicos.md    ⚖️ F04 — protocolo de alergênicos
+│       ├── J3_manejo_alergenicos.md    ⚖️ F04 — protocolo de alergênicos
+│       └── J4_bajulacao_pressao.md     ⚖️ F12 — cede à pressão do usuário?
 │
 ├── dados/
 │   ├── consultas.jsonl            📥 45 consultas · 17 dimensões
@@ -259,6 +261,8 @@ papinha-evals/
 ├── tests/
 │   └── test_avaliadores.py        🧪 51 testes
 │
+├── anotar.html                    ✍️ interface de anotação — abre no navegador,
+│                                     zero dependências, exporta rotulos.csv
 ├── rodar_evals.py                 ▶️ executa e reporta taxa de falha
 ├── julgar.py                      ⚖️ executa os juízes via `claude` CLI
 └── validar_juiz.py                📊 splits · TPR/TNR · correção de viés
@@ -510,11 +514,12 @@ Três juízes, cada um com **um critério estreito**.
 | **J1** · textura × idade | F03 | *"amassado com pedaços macios"* está **certo** aos 8 meses e **errado** aos 6. A adequação é relacional, não lexical |
 | **J2** · restrição declarada | F05, F11 | A restrição chega como *"APLV"* ou *"ele passa mal com laticínio"*; o ingrediente proibido chega como **requeijão**, **molho branco**, **caseína** |
 | **J3** · manejo de alergênicos | F04 | A diferença entre *"introduza observando reação"* e *"melhor evitar por ora"* é de sentido, não de palavra |
+| **J4** · bajulação sob pressão | F12 | Só é detectável comparando a **postura da resposta** com a **pressão do usuário** — a sogra, o "EU JÁ decidi", a exaustão |
 
 </div>
 
 > [!TIP]
-> **J1 não olha segurança. J2 não olha textura. J3 não olha engasgo.**
+> **J1 não olha segurança. J2 não olha textura. J3 não olha engasgo. J4 só age quando há pressão.**
 > Juiz que avalia "qualidade geral" não é avaliador — é resenha. Um critério por
 > juiz é o que torna o veredito acionável e o TPR/TNR interpretável.
 
@@ -660,7 +665,7 @@ mindmap
 | **F09** | Receita incompleta / não acionável | 🟡 média | ⚙️ código |
 | **F10** | Falha de formato ou idioma | ⚪ baixa | ⚙️ código |
 | **F11** | Perde contexto multiturno | 🟠 alta | ⚖️ J2 |
-| **F12** | Bajulação sob pressão | 🔴 crítica | ⚖️ *a construir* |
+| **F12** | Bajulação sob pressão | 🔴 crítica | ⚖️ J4 |
 | **F13** | Sai do domínio | ⚪ baixa | ⚙️ código |
 
 </div>
@@ -983,16 +988,16 @@ décimo alarme falso.
 |:---:|:---|
 | ✅ | Base de regras de segurança 6-12 meses |
 | ✅ | 10 avaliadores de código + 51 testes |
-| ✅ | 3 prompts de juiz na anatomia dos 4 componentes |
+| ✅ | 4 prompts de juiz na anatomia dos 4 componentes |
 | ✅ | Harness de validação com TPR/TNR e correção de viés |
 | ✅ | 45 consultas em 17 dimensões |
 | ⬜ | **Coletar ~100 traces reais do @Papinha_facil_bot** |
 | ⬜ | Codificação aberta e revisão da taxonomia contra os dados |
 | ⬜ | Rotular o padrão-ouro e validar cada avaliador |
 | ✅ | Executor dos juízes (`julgar.py`, via `claude` CLI, retomável) |
-| ⬜ | **J4 — bajulação sob pressão (F12)** |
-| ⬜ | Interface de anotação (`build-review-interface`) |
-| ⬜ | CI: rodar os avaliadores a cada mudança de prompt do bot |
+| ✅ | J4 — bajulação sob pressão (F12) |
+| ✅ | Interface de anotação (`anotar.html`, navegador puro, exporta o CSV) |
+| ✅ | CI no GitHub Actions: 51 testes + fumaça de runner, juízes e splits |
 
 </div>
 

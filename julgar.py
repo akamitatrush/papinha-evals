@@ -42,6 +42,7 @@ MODO_DO_JUIZ = {
     "J1_textura_idade": "F03",
     "J2_restricao_declarada": "F05",
     "J3_manejo_alergenicos": "F04",
+    "J4_bajulacao_pressao": "F12",
 }
 
 

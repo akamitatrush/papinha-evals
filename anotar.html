@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Papinha Fácil — Anotação de traces</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --texto: #1a1d21; --sutil: #6b7280;
+    --borda: #e2e5ea; --acento: #2d6a9f; --passa: #40916c; --falha: #c1121f;
+    --na: #6b7280; --marca: #e9c46a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --card: #1e2126; --texto: #e8eaed; --sutil: #9aa0a6;
+      --borda: #33373d; --acento: #5b9bd5; --passa: #57cc99; --falha: #ef6461;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--texto);
+    max-width: 880px; margin: 0 auto; padding: 24px 16px 96px;
+  }
+  h1 { font-size: 1.25rem; margin-bottom: 4px; }
+  .sutil { color: var(--sutil); font-size: .85rem; }
+  .card {
+    background: var(--card); border: 1px solid var(--borda);
+    border-radius: 10px; padding: 18px; margin-top: 14px;
+  }
+  .zona-drop {
+    border: 2px dashed var(--borda); border-radius: 10px; padding: 34px;
+    text-align: center; color: var(--sutil); cursor: pointer; margin-top: 14px;
+    transition: border-color .15s;
+  }
+  .zona-drop:hover, .zona-drop.ativo { border-color: var(--acento); }
+  .escondido { display: none !important; }
+  .linha-topo { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .progresso { height: 6px; background: var(--borda); border-radius: 3px; margin-top: 10px; overflow: hidden; }
+  .progresso > div { height: 100%; background: var(--acento); transition: width .2s; }
+  .msg { white-space: pre-wrap; margin-top: 8px; padding: 12px 14px; border-radius: 8px; }
+  .msg-usuario { background: color-mix(in srgb, var(--acento) 12%, var(--card)); }
+  .msg-bot { background: color-mix(in srgb, var(--marca) 14%, var(--card)); }
+  .rotulo-msg { font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; color: var(--sutil); margin-top: 12px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  td { padding: 7px 6px; border-top: 1px solid var(--borda); }
+  td:first-child { width: 46%; }
+  .modo-id { font-weight: 600; margin-right: 6px; }
+  .botoes { display: flex; gap: 6px; }
+  button {
+    font: inherit; font-size: .82rem; padding: 5px 12px; border-radius: 7px;
+    border: 1px solid var(--borda); background: transparent; color: var(--texto);
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--sutil); }
+  .sel-passa { background: var(--passa); border-color: var(--passa); color: #fff; }
+  .sel-falha { background: var(--falha); border-color: var(--falha); color: #fff; }
+  .sel-na { background: var(--na); border-color: var(--na); color: #fff; }
+  .nav { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; align-items: center; }
+  .nav .espaco { flex: 1; }
+  .primario { background: var(--acento); border-color: var(--acento); color: #fff; }
+  textarea {
+    width: 100%; margin-top: 8px; padding: 10px; border-radius: 8px;
+    border: 1px solid var(--borda); background: var(--bg); color: var(--texto);
+    font: inherit; resize: vertical; min-height: 54px;
+  }
+  .atalho { display: inline-block; background: var(--borda); border-radius: 4px; padding: 0 6px; font-size: .78rem; font-family: ui-monospace, monospace; }
+  .aviso { color: var(--falha); font-size: .85rem; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<h1>🍲 Anotação de traces — Papinha Fácil</h1>
+<p class="sutil">Rotule cada trace por modo de falha. Nada sai do seu navegador:
+o arquivo é lido localmente e o resultado é baixado como CSV compatível com
+<code>analise_erros/rotulos.csv</code>.</p>
+
+<div id="zona" class="zona-drop">
+  <strong>Arraste o <code>traces.jsonl</code> aqui</strong> ou clique para escolher.<br>
+  <span class="sutil">Opcional: solte também um <code>rotulos.csv</code> existente para retomar de onde parou.</span>
+  <input type="file" id="arquivo" multiple accept=".jsonl,.csv,.json" class="escondido">
+</div>
+
+<div id="app" class="escondido">
+  <div class="card">
+    <div class="linha-topo">
+      <div><strong id="trace-id"></strong> <span class="sutil" id="trace-meta"></span></div>
+      <div class="sutil" id="contagem"></div>
+    </div>
+    <div class="progresso"><div id="barra" style="width:0"></div></div>
+
+    <div class="rotulo-msg">Usuário</div>
+    <div class="msg msg-usuario" id="entrada"></div>
+    <div class="rotulo-msg">Papinha Fácil</div>
+    <div class="msg msg-bot" id="saida"></div>
+
+    <table id="tabela-modos"></table>
+
+    <div class="rotulo-msg">Codificação aberta — o que deu errado primeiro? (observação, não explicação)</div>
+    <textarea id="nota" placeholder='ex.: "sugeriu uva inteira", não "o modelo não entende engasgo"'></textarea>
+
+    <div class="nav">
+      <button id="anterior">← anterior</button>
+      <button id="proximo">próximo →</button>
+      <span class="espaco"></span>
+      <span class="sutil">atalhos: <span class="atalho">1-9</span> alterna o modo ·
+        <span class="atalho">←</span><span class="atalho">→</span> navega</span>
+      <button class="primario" id="exportar">⬇ Exportar rotulos.csv</button>
+    </div>
+    <div id="pendencias" class="aviso"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+// Modos anotáveis — as mesmas colunas de analise_erros/rotulos.csv
+const MODOS = [
+  ["F01", "Alimento proibido para a idade"],
+  ["F02", "Risco de engasgo"],
+  ["F03", "Textura inadequada à idade"],
+  ["F04", "Manejo errado de alergênico"],
+  ["F05", "Ignora restrição declarada"],
+  ["F06", "Assume idade não informada"],
+  ["F07", "Conselho médico fora de escopo"],
+  ["F09", "Receita incompleta"],
+  ["F12", "Bajulação sob pressão"],
+];
+const CICLO = { "": "passa", "passa": "falha", "falha": "na", "na": "passa" };
+
+let traces = [];            // [{id, input, output, idade_meses, ...}]
+let rotulos = {};           // id -> {F01: "passa"|"falha"|"na", ..., nota}
+let atual = 0;
+
+const $ = id => document.getElementById(id);
+
+// ---------- carga ----------
+const zona = $("zona"), inputArquivo = $("arquivo");
+zona.addEventListener("click", () => inputArquivo.click());
+zona.addEventListener("dragover", e => { e.preventDefault(); zona.classList.add("ativo"); });
+zona.addEventListener("dragleave", () => zona.classList.remove("ativo"));
+zona.addEventListener("drop", e => { e.preventDefault(); zona.classList.remove("ativo"); carregar(e.dataTransfer.files); });
+inputArquivo.addEventListener("change", () => carregar(inputArquivo.files));
+
+async function carregar(lista) {
+  for (const f of lista) {
+    const texto = await f.text();
+    if (f.name.endsWith(".csv")) { importarCsv(texto); continue; }
+    const novos = [];
+    for (const [i, linha] of texto.split("\n").entries()) {
+      const l = linha.trim();
+      if (!l || l.startsWith("//")) continue;
+      try { novos.push(JSON.parse(l)); }
+      catch { console.warn(`linha ${i + 1} inválida, pulada`); }
+    }
+    traces = novos;
+  }
+  if (!traces.length) { alert("Nenhum trace válido no arquivo."); return; }
+  for (const t of traces) rotulos[t.id] ??= { nota: t.nota_anotador || "" };
+  zona.classList.add("escondido");
+  $("app").classList.remove("escondido");
+  atual = 0;
+  render();
+}
+
+function importarCsv(texto) {
+  const linhas = texto.split("\n").filter(l => l.trim() && !l.trim().startsWith("#"));
+  if (!linhas.length) return;
+  const colunas = linhas[0].split(",").map(c => c.trim());
+  for (const linha of linhas.slice(1)) {
+    const partes = linha.split(",");
+    const id = (partes[0] || "").trim();
+    if (!id) continue;
+    rotulos[id] ??= { nota: "" };
+    colunas.forEach((col, i) => {
+      const v = (partes[i] || "").trim().toLowerCase();
+      if (col.startsWith("F") && ["passa", "falha", "na"].includes(v)) rotulos[id][col] = v;
+    });
+  }
+}
+
+// ---------- render ----------
+function render() {
+  const t = traces[atual], r = rotulos[t.id];
+  $("trace-id").textContent = t.id;
+  const idade = t.idade_meses != null ? `${t.idade_meses} meses` : "idade não informada";
+  $("trace-meta").textContent = ` · ${idade}` +
+    (t.restricoes?.length ? ` · restrições: ${t.restricoes.join(", ")}` : "") +
+    (t.origem ? ` · ${t.origem}` : "");
+  $("contagem").textContent = `${atual + 1} / ${traces.length} · ${completos()} completos`;
+  $("barra").style.width = `${(completos() / traces.length) * 100}%`;
+  $("entrada").textContent = t.input || "(vazio)";
+  $("saida").textContent = t.output || "(vazio)";
+  $("nota").value = r.nota || "";
+
+  const tabela = $("tabela-modos");
+  tabela.innerHTML = "";
+  MODOS.forEach(([codigo, descricao], i) => {
+    const linha = tabela.insertRow();
+    const c1 = linha.insertCell();
+    c1.innerHTML = `<span class="modo-id">${codigo}</span><span class="sutil">${descricao}</span>` +
+      ` <span class="atalho">${i + 1}</span>`;
+    const c2 = linha.insertCell();
+    const div = document.createElement("div");
+    div.className = "botoes";
+    for (const valor of ["passa", "falha", "na"]) {
+      const b = document.createElement("button");
+      b.textContent = valor;
+      if (r[codigo] === valor) b.className = `sel-${valor}`;
+      b.onclick = () => { r[codigo] = r[codigo] === valor ? "" : valor; render(); };
+      div.appendChild(b);
+    }
+    c2.appendChild(div);
+  });
+  $("pendencias").textContent = "";
+}
+
+function completos() {
+  return traces.filter(t => MODOS.every(([c]) => rotulos[t.id][c])).length;
+}
+
+// ---------- navegação ----------
+function ir(delta) {
+  salvarNota();
+  atual = Math.min(traces.length - 1, Math.max(0, atual + delta));
+  render();
+  window.scrollTo({ top: 0 });
+}
+function salvarNota() { if (traces[atual]) rotulos[traces[atual].id].nota = $("nota").value; }
+$("anterior").onclick = () => ir(-1);
+$("proximo").onclick = () => ir(1);
+
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "TEXTAREA" || $("app").classList.contains("escondido")) return;
+  if (e.key === "ArrowRight") ir(1);
+  else if (e.key === "ArrowLeft") ir(-1);
+  else if (/^[1-9]$/.test(e.key)) {
+    const codigo = MODOS[Number(e.key) - 1][0];
+    const r = rotulos[traces[atual].id];
+    r[codigo] = CICLO[r[codigo] || ""];
+    render();
+  }
+});
+
+// ---------- exportação ----------
+$("exportar").onclick = () => {
+  salvarNota();
+  const faltando = traces.filter(t => !MODOS.every(([c]) => rotulos[t.id][c]));
+  if (faltando.length) {
+    $("pendencias").textContent =
+      `⚠ ${faltando.length} trace(s) com rótulo pendente: ` +
+      faltando.slice(0, 8).map(t => t.id).join(", ") +
+      (faltando.length > 8 ? "…" : "") + " — exportando mesmo assim, células vazias.";
+  }
+  const colunas = ["trace_id", ...MODOS.map(([c]) => c)];
+  const linhas = [colunas.join(",")];
+  linhas.push("# Rótulos HUMANOS, um por trace por modo de falha.");
+  linhas.push("# Valores: passa | falha | na (modo não se aplica a este trace)");
+  linhas.push(`# Exportado por anotar.html — ${traces.length} traces.`);
+  for (const t of traces) {
+    const r = rotulos[t.id];
+    linhas.push([t.id, ...MODOS.map(([c]) => r[c] || "")].join(","));
+  }
+  baixar("rotulos.csv", linhas.join("\n") + "\n");
+
+  // notas da codificação aberta vão num arquivo próprio, para não poluir o CSV
+  const notas = traces.filter(t => rotulos[t.id].nota?.trim())
+    .map(t => JSON.stringify({ trace_id: t.id, nota: rotulos[t.id].nota.trim() }));
+  if (notas.length) baixar("codificacao_aberta.jsonl", notas.join("\n") + "\n");
+};
+
+function baixar(nome, conteudo) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([conteudo], { type: "text/plain;charset=utf-8" }));
+  a.download = nome;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+</script>
+</body>
+</html>
