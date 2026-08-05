@@ -94,3 +94,9 @@ tipos novos de falha.
 falha**. É esse arquivo que alimenta a validação dos juízes (`validar_juiz.py`) —
 sem ele não há como medir TPR/TNR, e um juiz não validado é só mais um LLM
 opinando.
+
+---
+
+## O auditor
+
+A peça que decide quais achados procedem foi medida em 66 achados de F06 com verdade humana: **concordância 63,6%, TPR 65,7%, TNR 61,3%**. A soma TPR+TNR de **1,270** a torna incorrigível por Rogan-Gladen — a fórmula devolve valor negativo. Toda taxa que dependa da auditoria carrega essa incerteza.

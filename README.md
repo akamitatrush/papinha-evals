@@ -1387,6 +1387,40 @@ derrubou o TPR quinze pontos. Neste domínio o falso negativo é o erro que dói
 deixar passar mel para um bebê de 8 meses — então a versão estrita foi
 descartada mesmo tendo o TNR mais alto.
 
+### O auditor também foi medido — e reprovou
+
+O pipeline tem uma peça que decide quais achados procedem. Ela sempre foi a maior
+ressalva aberta do projeto: *um juiz não medido decidindo o que conta como falha*.
+
+Agora está medida. Os achados de F06 têm verdade humana, então dá para comparar:
+
+| | Concordância | TPR | TNR | **TPR+TNR** |
+|:---|---:|---:|---:|---:|
+| Avaliador de código (F06) | — | 76,1% | 79,2% | **1,553** |
+| **Auditor** | **63,6%** | 65,7% | 61,3% | **1,270** |
+
+O auditor concorda com o humano em **64%** dos casos (n=66). Como 53% dos achados
+eram falha real, responder *"procede"* sempre acertaria 53%. Ele entrega 64% —
+melhor que trivial, longe de confiável.
+
+**E é matematicamente incorrigível.** Rogan-Gladen divide por `TPR + TNR − 1`:
+
+```
+avaliador de código   denominador 0,553   →  33,8% vira 23,5%   ✓
+auditor               denominador 0,270   →  30,1% vira −31,9%  ✗
+```
+
+Número negativo não é bug da fórmula — é o avaliador dizendo que **não carrega
+informação suficiente**. Com a soma encostando em 1, ele acerta quase tanto
+quanto erra, e não há verdade a recuperar do que reporta.
+
+Consequência prática: **a precisão de 30% que o auditor calculou para os 163
+achados não é confiável**, e toda taxa deste projeto que dependa da auditoria
+carrega essa incerteza. Está escrito no relatório, no site e aqui.
+
+É a tese do projeto recursando um nível. *Um eval não medido mede a si próprio* —
+medimos o meta-avaliador, e ele não passa.
+
 ### Uma ambiguidade que ficou registrada, não contornada
 
 No trace `c139` o bot pede os ingredientes, **nunca pergunta a idade** e não

@@ -476,7 +476,21 @@ footer a:hover{color:var(--sinal);border-bottom-color:var(--sinal)}
 
     <p class="veredito">Abaixo da meta de 90% — <b>e isso está no relatório</b>.</p>
 
-    <div class="cit bom" style="margin-top:2rem">
+    <h2 style="margin-top:3rem">E quando o avaliador não presta?</h2>
+    <p>A mesma medição aplicada ao <b>auditor</b> — a peça do pipeline que decide
+       quais achados procedem — deu outro resultado.</p>
+    <div class="cit mau" style="margin-top:1.5rem">
+      <span class="quem">O auditor, medido em 66 achados com verdade humana</span>
+      <div class="fala">Concorda com o humano em <mark>64%</mark> dos casos.
+        TPR 66%, TNR 61%. Soma: <mark>1,27</mark>.</div>
+      <p class="nota">A correção de viés divide por (TPR + TNR − 1) = 0,27.
+        Aplicada à precisão de 30% que ele reporta, devolve <b>−32%</b> — impossível.
+        Um avaliador cuja soma encosta em 1 acerta quase tanto quanto erra: não há
+        verdade a recuperar do que ele diz. <b>É a tese do projeto um nível acima —
+        medimos o meta-avaliador, e ele não passa.</b></p>
+    </div>
+
+    <div class="cit bom" style="margin-top:1rem">
       <span class="quem">A razão prática de medir o avaliador</span>
       <div class="fala">Taxa bruta do detector: <mark>33,8%</mark>. Corrigida pelo
         TPR/TNR: <mark>23,6%</mark>. Taxa real, pelos rótulos humanos:
@@ -622,10 +636,12 @@ footer a:hover{color:var(--sinal);border-bottom-color:var(--sinal)}
            humanos. <b>Nenhum dos dois bate a meta de 90%</b> — o melhor TPR é 87%,
            o melhor TNR é 79%, e não são o mesmo avaliador. Os outros treze modos
            continuam sem padrão-ouro.</p></div>
-      <div class="ress"><h4>O auditor não está validado</h4>
-        <p>O pipeline usa um LLM para decidir se cada achado procede — ele próprio um
-           juiz não medido, que deu respostas diferentes para o mesmo caso em execuções
-           distintas.</p></div>
+      <div class="ress" style="border-top-color:var(--critico)">
+        <h4>O auditor foi medido — e reprovou</h4>
+        <p>A peça que decide o que procede concorda com o humano em <b>64%</b> dos
+           casos. Soma TPR+TNR de <b>1,27</b>: acerta quase tanto quanto erra, e a
+           correção de viés aplicada ao que ele reporta devolve número negativo.
+           <b>Não dá para corrigir o que ele diz.</b></p></div>
       <div class="ress"><h4>35 traces não são 100</h4>
         <p>A coleta gravada acima cobriu dois modos que estavam sem nenhuma ocorrência
            — e o bot passou nos dois. Um trace por modo não valida avaliador nenhum.</p></div>

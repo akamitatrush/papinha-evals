@@ -120,6 +120,19 @@
     "c93.0",
     "c94.0"
    ]
+  },
+  "AUDITOR": {
+   "avaliador": "auditor de falsos positivos",
+   "n": 66,
+   "vp": 23,
+   "fp": 12,
+   "vn": 19,
+   "fn": 12,
+   "tpr": 0.6571428571428571,
+   "tnr": 0.6129032258064516,
+   "precisao": 0.6571428571428571,
+   "f1": 0.6571428571428571,
+   "nota": "medido nos achados de F06, os únicos com verdade humana"
   }
  },
  "n_modos_validados": 2,

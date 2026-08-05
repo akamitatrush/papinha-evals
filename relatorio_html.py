@@ -134,6 +134,8 @@ h2{font-family:var(--sans);font-weight:500;font-size:1.45rem;letter-spacing:-.03
   gap:1rem;margin-top:1rem}
 .correcao{border:1px solid var(--regua);border-radius:4px;background:var(--superficie);
   padding:1rem 1.1rem}
+.correcao.incorrigivel{border-color:var(--real);box-shadow:inset 0 0 0 1px rgba(168,63,46,.3)}
+.correcao.incorrigivel p b{color:var(--real-viva)}
 .correcao>b{display:block;font-family:var(--mono);font-size:.72rem;
   color:var(--acento);margin-bottom:.7rem}
 .correcao .par{display:flex;align-items:baseline;gap:.6rem;padding:.35rem 0;
@@ -283,6 +285,27 @@ def _secao_validacao(raiz: Path) -> str:
         _correcao(m, v, []) for m, v in sorted(d.get("modos", {}).items()) if v.get("n")
     )
 
+    # O auditor é a peça que decide o que procede. Se ele estiver medido, o
+    # aviso vem antes de tudo: a precisão que este relatório publica é opinião
+    # dele, e o leitor precisa saber quanto essa opinião vale.
+    aud = d.get("modos", {}).get("AUDITOR")
+    alerta_auditor = ""
+    if aud and aud.get("tpr") is not None:
+        soma = aud["tpr"] + aud["tnr"]
+        conc = (aud["vp"] + aud["vn"]) / aud["n"]
+        alerta_auditor = (
+            f'<div class="alerta"><b>O auditor foi medido — e não é confiável</b>'
+            f'Ele concorda com o julgamento humano em <b>{conc:.0%}</b> dos casos '
+            f'(n={aud["n"]}), com TPR {aud["tpr"]:.0%} e TNR {aud["tnr"]:.0%}. '
+            f'A soma TPR+TNR é <b>{soma:.3f}</b>: um avaliador com essa soma '
+            f'encostando em 1 acerta quase tanto quanto erra. '
+            f'A correção de viés divide por (TPR+TNR−1) = {soma - 1:.3f} e, '
+            f'aplicada à precisão que ele reporta, devolve um número negativo — '
+            f'impossível. <b>Não dá para corrigir o que este auditor reporta.</b> '
+            f'Toda taxa deste relatório que dependa da auditoria carrega essa '
+            f'incerteza.</div>'
+        )
+
     n = d.get("n_rotulos", 0)
     aviso = ""
     if n < 40:
@@ -293,6 +316,7 @@ def _secao_validacao(raiz: Path) -> str:
 
     return (
         '<h2>Validação contra rótulo humano</h2>'
+        + alerta_auditor +
         f'<p class="dica">Classe positiva é <b>falha</b>. TPR é quanto o avaliador '
         f'pega do que o humano marcou como falha; TNR é quanto ele deixa passar do '
         f'que o humano marcou como correto. O F1 é a média harmônica de '
@@ -327,8 +351,27 @@ def _correcao(modo: str, v: dict, brutos: list) -> str:
         return ""
     n = v["n"]
     bruta = (v["vp"] + v["fp"]) / n if n else 0
-    real = (bruta + tnr - 1) / (tpr + tnr - 1)
-    real = min(max(real, 0.0), 1.0)
+    bruto_real = (bruta + tnr - 1) / (tpr + tnr - 1)
+
+    # Correção fora de [0,1] não é erro de conta: é o avaliador dizendo que não
+    # carrega informação suficiente. O denominador é (TPR + TNR - 1) — quando a
+    # soma encosta em 1, ele acerta quase tanto quanto erra e não há verdade a
+    # recuperar. Recortar para 0% aqui esconderia justamente isso.
+    if not 0.0 <= bruto_real <= 1.0:
+        return (
+            f'<div class="correcao incorrigivel">'
+            f'<b>{_e(modo)} · {_e(v["avaliador"])}</b>'
+            f'<div class="par"><span>taxa bruta</span><i class="ruim">{bruta:.1%}</i></div>'
+            f'<div class="par"><span>TPR + TNR</span>'
+            f'<i class="ruim">{tpr + tnr:.3f}</i></div>'
+            f'<p><b>Não corrigível.</b> A correção de viés divide por '
+            f'(TPR + TNR − 1) = {tpr + tnr - 1:.3f} e devolve {bruto_real:+.0%}, '
+            f'que é impossível. Um avaliador com a soma encostando em 1 acerta '
+            f'quase tanto quanto erra — não há verdade a recuperar do que ele '
+            f'reporta.</p></div>'
+        )
+
+    real = bruto_real
     erro = (bruta - real) / real if real else 0
     return (
         f'<div class="correcao">'
