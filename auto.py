@@ -129,8 +129,14 @@ def main() -> int:
         n += 1
         etapa(n, total, "Relatório")
         from relatorio import gerar
+        from relatorio_html import gerar_html
         gerar(args.saida, traces, brutos, revisar, [], [], None, None, inicio, args.modelo)
+        # O painel também na rodada grátis: era gerado só no pipeline completo,
+        # e quem roda sem API ficava sem a peça visual.
+        painel = args.saida.with_suffix(".html")
+        gerar_html(painel, traces, brutos, revisar, [], [], None, None, inicio, args.modelo)
         print(f"{VERDE}relatório em {args.saida}{FIM}")
+        print(f"{VERDE}painel  em {painel}{FIM}")
         return 0
 
     from llm.cliente import ClienteLLM

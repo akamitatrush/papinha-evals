@@ -21,3 +21,7 @@ node_modules/
 
 # gerado por discordancias.py, muda a cada calibração
 discordancias.html
+
+# relatórios gerados por rodada, não são artefato do projeto
+relatorio_turma.md
+relatorio_turma.html

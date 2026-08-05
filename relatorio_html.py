@@ -130,6 +130,22 @@ h2{font-family:var(--sans);font-weight:500;font-size:1.45rem;letter-spacing:-.03
 .cel.passa{background:transparent;border-color:var(--ok);color:var(--ok-viva)}
 
 .rolo{overflow-x:auto}
+.correcoes{display:grid;grid-template-columns:repeat(auto-fit,minmax(17rem,1fr));
+  gap:1rem;margin-top:1rem}
+.correcao{border:1px solid var(--regua);border-radius:4px;background:var(--superficie);
+  padding:1rem 1.1rem}
+.correcao>b{display:block;font-family:var(--mono);font-size:.72rem;
+  color:var(--acento);margin-bottom:.7rem}
+.correcao .par{display:flex;align-items:baseline;gap:.6rem;padding:.35rem 0;
+  border-bottom:1px solid var(--regua)}
+.correcao .par:last-of-type{border-bottom:none}
+.correcao .par span{font-size:.8125rem;color:var(--tinta-meia)}
+.correcao .par i{margin-left:auto;font-style:normal;font-family:var(--mono);
+  font-size:1.15rem;font-weight:700;font-variant-numeric:tabular-nums}
+.correcao .par i.ruim{color:var(--real-viva)}
+.correcao .par i.bom{color:var(--ok-viva)}
+.correcao p{font-size:.8125rem;line-height:1.55;color:var(--tinta-fina);
+  margin:.7rem 0 0}
 .matrizes{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));
   gap:1rem;margin-top:1rem}
 .matriz{margin:0;border:1px solid var(--regua);border-radius:4px;
@@ -263,6 +279,9 @@ def _secao_validacao(raiz: Path) -> str:
     matrizes = "".join(
         _matriz(m, v) for m, v in sorted(d.get("modos", {}).items()) if v.get("n")
     )
+    correcoes = "".join(
+        _correcao(m, v, []) for m, v in sorted(d.get("modos", {}).items()) if v.get("n")
+    )
 
     n = d.get("n_rotulos", 0)
     aviso = ""
@@ -286,7 +305,41 @@ def _secao_validacao(raiz: Path) -> str:
            f'os dois erros não custam o mesmo: um <b>falso positivo</b> gasta '
            f'tempo de revisão, um <b>falso negativo</b> deixa passar mel para um '
            f'bebê de 8 meses. Por isso o FN vem destacado.</p>'
-           f'<div class="matrizes">{matrizes}</div>' if matrizes else "")
+           f'<div class="matrizes">{matrizes}</div>'
+           + (f'<h2>Correção de viés</h2>'
+              f'<p class="dica">Com TPR e TNR medidos, a taxa que o detector '
+              f'reporta pode ser corrigida sem rotular a produção inteira — é a '
+              f'razão prática de validar o avaliador.</p>'
+              f'<div class="correcoes">{correcoes}</div>' if correcoes else "")
+           if matrizes else "")
+    )
+
+
+def _correcao(modo: str, v: dict, brutos: list) -> str:
+    """Taxa bruta versus taxa corrigida pelo viés do próprio avaliador.
+
+    Rogan-Gladen: real = (observada + TNR - 1) / (TPR + TNR - 1). É a razão
+    prática de medir o avaliador — com TPR e TNR na mão dá para corrigir o
+    número que ele reporta, sem rotular a produção inteira.
+    """
+    tpr, tnr = v.get("tpr"), v.get("tnr")
+    if tpr is None or tnr is None or (tpr + tnr - 1) <= 0:
+        return ""
+    n = v["n"]
+    bruta = (v["vp"] + v["fp"]) / n if n else 0
+    real = (bruta + tnr - 1) / (tpr + tnr - 1)
+    real = min(max(real, 0.0), 1.0)
+    erro = (bruta - real) / real if real else 0
+    return (
+        f'<div class="correcao">'
+        f'<b>{_e(modo)} · {_e(v["avaliador"])}</b>'
+        f'<div class="par"><span>taxa bruta do detector</span>'
+        f'<i class="ruim">{bruta:.1%}</i></div>'
+        f'<div class="par"><span>corrigida pelo TPR/TNR</span>'
+        f'<i class="bom">{real:.1%}</i></div>'
+        f'<p>O número bruto {"superestima" if erro > 0 else "subestima"} em '
+        f'<b>{abs(erro):.0%}</b>. Reportar a taxa crua seria reportar os bugs do '
+        f'detector junto com o comportamento do bot.</p></div>'
     )
 
 
@@ -434,6 +487,39 @@ def gerar_html(caminho: Path, traces, brutos, revisar, auditados, anotacoes,
                          f'{_e(a["trace_id"])} · {_e(a["avaliador"])}</span>'
                          f'{_e(a["auditoria"]["explicacao"])}</div>')
             p.append('</div>')
+
+    # Rodada sem LLM: as seções acima dependem da auditoria, mas achado por
+    # avaliador e resultado por trace saem direto dos avaliadores de código.
+    # Sem isto o painel da rodada grátis fica só com o cabeçalho.
+    if not auditados and brutos:
+        por_av = Counter(a["avaliador"] for a in brutos)
+        criticas = Counter(a["avaliador"] for a in brutos if a.get("gravidade") == "critica")
+        maximo = max(por_av.values())
+        linhas = [
+            (nome, [(criticas.get(nome, 0), "var(--real)", "crítica"),
+                    (n - criticas.get(nome, 0), "var(--pendente)", "não crítica")],
+             f'{criticas.get(nome, 0)}/{n}')
+            for nome, n in por_av.most_common()
+        ]
+        p.append('<h2>Achados por avaliador</h2>')
+        p.append('<p class="dica">Contagem <b>bruta</b>, sem auditoria. Vermelho é '
+                 'gravidade crítica. Estes números descrevem o que os detectores '
+                 'apontaram — não necessariamente o que o bot fez.</p>')
+        p.append(_barras_empilhadas(linhas, maximo))
+
+        com_falha = {a["trace_id"] for a in brutos}
+        p.append('<h2>Resultado por trace</h2>')
+        p.append('<p class="dica">Uma célula por trace. Vermelha, ao menos um '
+                 'detector apontou falha.</p><div class="grade">')
+        for t in traces:
+            marca = "falha" if t["id"] in com_falha else "passa"
+            p.append(f'<div class="cel {marca}" title="{_e(t["id"])}">'
+                     f'{_e(str(t["id"])[-3:])}</div>')
+        p.append('</div>')
+        p.append(f'<p class="dica" style="margin-top:.8rem">'
+                 f'<b>{len(com_falha)}</b> de <b>{len(traces)}</b> traces com ao '
+                 f'menos um achado — <b>{len(com_falha)/max(1,len(traces)):.0%}</b> '
+                 f'bruto.</p>')
 
     # ── grade de traces ──
     if anotacoes:

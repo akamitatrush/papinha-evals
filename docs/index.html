@@ -476,6 +476,17 @@ footer a:hover{color:var(--sinal);border-bottom-color:var(--sinal)}
 
     <p class="veredito">Abaixo da meta de 90% — <b>e isso está no relatório</b>.</p>
 
+    <div class="cit bom" style="margin-top:2rem">
+      <span class="quem">A razão prática de medir o avaliador</span>
+      <div class="fala">Taxa bruta do detector: <mark>33,8%</mark>. Corrigida pelo
+        TPR/TNR: <mark>23,6%</mark>. Taxa real, pelos rótulos humanos:
+        <mark>23,6%</mark>.</div>
+      <p class="nota">A fórmula de Rogan-Gladen recuperou a taxa verdadeira usando
+        só TPR e TNR — sem olhar os rótulos. O número bruto superestimava em 43%.
+        Medir o avaliador não serve só para saber se ele presta: serve para
+        <b>corrigir o que ele reporta</b>.</p>
+    </div>
+
     <h2 style="margin-top:3rem">Código ou juiz? A medição decidiu</h2>
     <p>O mesmo critério tem as duas naturezas de avaliador implementadas. Rodaram
        sobre os mesmos 195 traces, contra o mesmo padrão-ouro.</p>
@@ -563,6 +574,17 @@ footer a:hover{color:var(--sinal);border-bottom-color:var(--sinal)}
           <span class="abrir">abrir →</span>
         </div>
       </a>
+      <a class="ferr" href="relatorio-turma.html">
+        <figure><img src="img/relatorio-escuro.png" alt="Painel do relatório com matriz de confusão e correção de viés" loading="lazy"></figure>
+        <div class="corpo">
+          <span class="rot mudo">195 traces</span>
+          <h3>Relatório do dataset da turma</h3>
+          <p>Os seis avaliadores de código sobre as 195 conversas, com a matriz de
+             confusão e a correção de viés do único modo medido.</p>
+          <span class="abrir">abrir →</span>
+        </div>
+      </a>
+
       <a class="ferr" href="relatorio-exemplo.html">
         <figure><img src="img/relatorio-escuro.png" alt="Painel do relatório com a precisão dos avaliadores em destaque" loading="lazy"></figure>
         <div class="corpo">
